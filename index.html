@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>汉语 · ระบบทบทวนภาษาจีน</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Sans+Thai:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hanzi-writer/3.5.1/hanzi-writer.min.js"></script>
+<style>
+:root{
+  --ink:#1c1814;--paper:#f7f3ec;--p2:#ede8df;--p3:#e2dbd1;
+  --red:#c0392b;--red2:#e74c3c;--gold:#b8860b;--gold2:#d4a017;
+  --green:#27ae60;--blue:#2471a3;--orange:#e67e22;
+  --muted:#8a7d70;--line:rgba(0,0,0,0.10);
+  --sh:0 2px 10px rgba(0,0,0,0.08);--sh2:0 4px 24px rgba(0,0,0,0.13);
+  --r:12px;--r2:8px;
+  --zh:"Noto Serif SC",serif;
+  --ui:"Noto Sans Thai","Noto Sans SC",sans-serif;
+  --en:"Lora",serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--ui);background:var(--paper);color:var(--ink);-webkit-tap-highlight-color:transparent;}
+button{cursor:pointer;font-family:inherit;border:none;}
+
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+/* NAV */
+.nav{background:var(--ink);color:white;height:52px;padding:0 16px;
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+  box-shadow:0 2px 12px rgba(0,0,0,.4);z-index:200;}
+.nav-brand{font-family:var(--zh);font-size:1.1rem;letter-spacing:.04em;white-space:nowrap;}
+.nav-tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;scrollbar-width:none;}
+.nav-tabs::-webkit-scrollbar{display:none;}
+.ntab{padding:6px 12px;border-radius:16px;background:transparent;color:rgba(255,255,255,.5);
+  font-size:.75rem;font-weight:600;white-space:nowrap;transition:all .2s;}
+.ntab:hover{color:white;background:rgba(255,255,255,.1);}
+.ntab.on{color:white;background:var(--red);}
+
+.wrap{display:flex;flex:1;overflow:hidden;}
+
+/* SIDEBAR */
+.sb{width:200px;min-width:200px;background:var(--p2);border-right:1px solid var(--line);
+  overflow-y:auto;height:100%;padding:8px 0 24px;}
+.sb-bk{font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);padding:10px 14px 4px;display:flex;align-items:center;gap:5px;}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sbi{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;
+  border-left:3px solid transparent;transition:all .15s;
+  border-radius:0 6px 6px 0;margin-right:6px;}
+.sbi:hover{background:rgba(0,0,0,.05);}
+.sbi.on{background:rgba(192,57,43,.09);border-left-color:var(--red);}
+.sbi-n{font-family:var(--zh);font-size:.95rem;font-weight:700;color:var(--muted);min-width:22px;}
+.sbi.on .sbi-n{color:var(--red);}
+.sbi-t{flex:1;min-width:0;}
+.sbi-zh{font-family:var(--zh);font-size:.8rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sbi-en{font-size:.6rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sbi-c{font-size:.58rem;padding:1px 4px;border-radius:6px;background:var(--p3);color:var(--muted);font-weight:700;flex-shrink:0;}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;height:100%;}
+.view{display:none;}
+.view.on{display:block;}
+
+/* ── LESSON ── */
+.lw{padding:24px 28px;max-width:860px;}
+.lh{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px;
+  padding-bottom:18px;border-bottom:1px solid var(--line);}
+.lh-c{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-family:var(--zh);font-size:1.4rem;font-weight:700;
+  color:white;flex-shrink:0;box-shadow:0 3px 14px rgba(0,0,0,.2);}
+.lh-zh{font-family:var(--zh);font-size:1.6rem;font-weight:700;line-height:1.2;}
+.lh-en{font-family:var(--en);font-style:italic;color:var(--muted);margin-top:2px;font-size:.88rem;}
+.lh-btns{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end;}
+.btn{padding:7px 15px;border-radius:20px;font-size:.75rem;font-weight:600;transition:all .2s;}
+.btn-r{background:var(--red);color:white;}.btn-r:hover{background:var(--red2);}
+.btn-g{background:var(--gold);color:white;}.btn-g:hover{background:var(--gold2);}
+.btn-p{background:#444;color:white;}.btn-p:hover{background:#222;}
+.btn-o{background:var(--p3);color:var(--ink);}.btn-o:hover{background:var(--p2);}
+
+.sec{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px;}
+.sec::after{content:'';flex:1;height:1px;background:var(--line);}
+
+/* DIALOGUE */
+.dlg{background:white;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;}
+.dl{display:grid;grid-template-columns:34px 1fr;gap:10px;padding:10px 14px;
+  border-bottom:1px solid rgba(0,0,0,.04);transition:background .12s;}
+.dl:last-child{border-bottom:none;}
+.dl:hover{background:#fffbf8;}
+.dl-sp{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;font-weight:700;font-size:.65rem;color:white;
+  flex-shrink:0;margin-top:2px;}
+.dl-zh{font-family:var(--zh);font-size:1rem;font-weight:500;line-height:1.5;}
+.dl-py{font-size:.72rem;color:var(--gold2);margin-top:1px;}
+.dl-th{font-size:.78rem;color:var(--blue);margin-top:2px;}
+
+/* KEY SENTENCES */
+.ks{background:linear-gradient(135deg,#fff9f6,#fff4ef);
+  border:1px solid rgba(192,57,43,.13);border-left:4px solid var(--red);
+  border-radius:0 var(--r2) var(--r2) 0;padding:9px 13px;
+  font-size:.85rem;line-height:1.6;margin-bottom:6px;}
+
+/* GRAMMAR */
+.gc{background:white;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:10px;}
+.gc-h{background:linear-gradient(135deg,#1a1410,#3a3025);color:white;
+  padding:9px 14px;display:flex;align-items:center;gap:8px;}
+.gc-tag{font-size:.6rem;padding:2px 6px;border-radius:7px;background:rgba(255,255,255,.2);font-weight:700;}
+.gc-ttl{font-family:var(--zh);font-size:.88rem;font-weight:500;}
+.gc-b{padding:11px 14px;}
+.gc-pat{font-family:var(--zh);font-size:.95rem;color:var(--red);font-weight:700;
+  background:rgba(192,57,43,.07);padding:5px 10px;border-radius:6px;
+  display:inline-block;margin-bottom:7px;}
+.gc-exp{font-size:.78rem;color:var(--ink);line-height:1.6;margin-bottom:7px;}
+.gc-ex{font-size:.78rem;background:var(--p2);border-radius:6px;padding:7px 11px;line-height:1.7;}
+.gc-ex-zh{font-family:var(--zh);font-weight:500;}
+.gc-ex-th{color:var(--blue);font-size:.75rem;}
+
+/* VOCAB TABLE */
+.vt-w{background:white;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;}
+.vt{width:100%;border-collapse:collapse;}
+.vt th{background:var(--ink);color:white;padding:7px 11px;font-size:.65rem;
+  text-align:left;font-weight:600;letter-spacing:.06em;}
+.vt tr:nth-child(even){background:var(--paper);}
+.vt tr:hover{background:#fff5f0;}
+.vt td{padding:8px 11px;border-bottom:1px solid var(--line);font-size:.82rem;vertical-align:middle;}
+.vt-zh{font-family:var(--zh);font-size:1.1rem;font-weight:500;}
+.vt-py{color:var(--red);font-size:.75rem;}
+.vt-type{font-size:.6rem;padding:1px 5px;border-radius:4px;background:var(--p3);color:var(--muted);}
+.vt-th{color:var(--blue);font-weight:500;}
+.stroke-btn{padding:3px 8px;border-radius:10px;font-size:.65rem;font-weight:600;
+  background:var(--p3);color:var(--muted);transition:all .15s;}
+.stroke-btn:hover{background:var(--orange);color:white;}
+
+/* ── FLASHCARD ── */
+.fcv{display:flex;flex-direction:column;align-items:center;padding:24px 16px;
+  min-height:100%;gap:16px;}
+.fc-top{text-align:center;max-width:500px;width:100%;}
+.fc-name{font-family:var(--zh);font-size:1rem;font-weight:500;margin-bottom:8px;}
+.fc-modes{display:flex;gap:5px;justify-content:center;margin-bottom:10px;flex-wrap:wrap;}
+.fcm{padding:4px 12px;border-radius:12px;border:1.5px solid var(--line);
+  background:white;font-size:.72rem;font-weight:600;color:var(--muted);transition:all .15s;}
+.fcm.on{background:var(--red);color:white;border-color:var(--red);}
+.fc-dots{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin-bottom:4px;}
+.fcd{width:8px;height:8px;border-radius:50%;background:var(--p3);
+  border:1px solid var(--line);cursor:pointer;transition:background .2s;}
+.fcd.seen{background:var(--gold);}
+.fcd.cur{background:var(--red);transform:scale(1.3);}
+
+.fc-wrap{width:100%;max-width:480px;}
+.fc-card{width:100%;min-height:270px;border-radius:var(--r);
+  box-shadow:0 8px 32px rgba(0,0,0,.14);cursor:pointer;
+  user-select:none;-webkit-user-select:none;
+  position:relative;transition:transform .1s ease;}
+.fc-card:active{transform:scale(.98);}
+
+/* ── CRITICAL FIX: use visibility/position not display:none on inner faces ── */
+.fc-front,.fc-back{
+  width:100%;padding:36px 28px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;min-height:270px;
+  border-radius:var(--r);
+}
+.fc-back{display:none;}
+.fc-card.flipped .fc-front{display:none;}
+.fc-card.flipped .fc-back{display:flex;background:var(--ink);}
+.fc-front{background:white;}
+
+.fc-big{font-family:var(--zh);font-size:5rem;line-height:1;font-weight:700;color:var(--ink);}
+.fc-hint{margin-top:18px;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.fc-hint::before{content:"👆";}
+.fc-py{font-size:1.3rem;color:var(--gold2);font-weight:500;margin-bottom:5px;}
+.fc-typ{font-size:.65rem;padding:2px 7px;border-radius:9px;
+  background:rgba(255,255,255,.15);color:rgba(255,255,255,.7);margin-bottom:12px;}
+.fc-en{font-family:var(--en);font-size:1rem;color:rgba(255,255,255,.9);margin-bottom:8px;}
+.fc-th{font-size:1.1rem;color:var(--gold2);font-weight:600;}
+
+.fc-ctrl{display:flex;gap:10px;align-items:center;}
+.fcb{padding:9px 22px;border-radius:26px;font-size:.85rem;font-weight:700;transition:all .2s;}
+.fcb-prev{background:var(--p3);color:var(--ink);}
+.fcb-prev:hover{background:var(--p2);}
+.fcb-next{background:var(--red);color:white;box-shadow:0 3px 14px rgba(192,57,43,.35);}
+.fcb-next:hover{background:var(--red2);transform:translateY(-1px);}
+.fc-cnt{color:var(--muted);font-size:.82rem;min-width:52px;text-align:center;}
+.fc-kbd{font-size:.68rem;color:var(--muted);}
+.kbd{display:inline-block;padding:1px 5px;background:var(--p3);border-radius:4px;
+  font-size:.65rem;border:1px solid var(--line);}
+
+/* ── QUIZ ── */
+.qw{padding:24px 28px;max-width:700px;}
+.qh-ti{font-family:var(--zh);font-size:1.3rem;font-weight:700;}
+.qh-su{color:var(--muted);font-size:.8rem;margin-top:3px;}
+.qmodes{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.qmode{padding:6px 16px;border-radius:18px;border:2px solid var(--line);
+  background:white;font-size:.76rem;font-weight:600;color:var(--muted);transition:all .15s;}
+.qmode.on{border-color:var(--red);color:var(--red);background:rgba(192,57,43,.05);}
+.qstat{display:flex;gap:14px;background:var(--p2);border-radius:var(--r2);
+  padding:9px 14px;margin-bottom:14px;font-size:.78rem;}
+.qsc{font-weight:700;color:var(--green);}
+.qcard{background:white;border-radius:var(--r);box-shadow:var(--sh2);padding:24px 20px;margin-bottom:14px;}
+.q-zh{font-family:var(--zh);font-size:2.2rem;text-align:center;margin-bottom:5px;}
+.q-py{text-align:center;font-size:.85rem;color:var(--gold);margin-bottom:18px;}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.qopt{padding:11px 14px;border-radius:var(--r2);border:2px solid var(--line);
+  background:white;font-size:.85rem;text-align:center;transition:all .2s;cursor:pointer;}
+.qopt:hover{border-color:var(--red);color:var(--red);}
+.qopt.ok{background:rgba(39,174,96,.1);border-color:var(--green);color:var(--green);}
+.qopt.bad{background:rgba(192,57,43,.1);border-color:var(--red);color:var(--red);}
+.qres{text-align:center;margin-top:12px;font-size:.88rem;font-weight:600;
+  padding:9px;border-radius:var(--r2);}
+.qres.ok{background:rgba(39,174,96,.1);color:var(--green);}
+.qres.bad{background:rgba(192,57,43,.1);color:var(--red);}
+.q-fill{width:100%;padding:11px 14px;border-radius:var(--r2);
+  border:2px solid var(--line);font-family:var(--zh);
+  font-size:1.2rem;text-align:center;outline:none;transition:border .2s;}
+.q-fill:focus{border-color:var(--red);}
+.qbtn{width:100%;padding:11px;border-radius:var(--r2);
+  background:var(--red);color:white;font-size:.88rem;font-weight:700;
+  margin-top:10px;transition:all .2s;}
+.qbtn.blue{background:var(--blue);}
+.qbtn:hover{opacity:.9;}
+
+/* ── GRAMMAR VIEW ── */
+.gv{padding:24px 28px;max-width:1000px;}
+.gv-ti{font-family:var(--zh);font-size:1.4rem;font-weight:700;}
+.gv-su{color:var(--muted);font-size:.8rem;margin-top:3px;}
+.gbsec{margin-bottom:28px;}
+.gblabel{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.gbtag{padding:4px 12px;border-radius:16px;font-size:.72rem;font-weight:700;color:white;}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:9px;}
+.gm{background:white;border-radius:var(--r2);box-shadow:var(--sh);overflow:hidden;}
+.gm-h{background:var(--ink);color:white;padding:7px 12px;font-size:.75rem;font-weight:700;}
+.gm-b{padding:9px 12px;}
+.gm-pat{font-family:var(--zh);font-size:.9rem;color:var(--red);font-weight:500;margin-bottom:3px;}
+.gm-ex{font-size:.72rem;color:var(--muted);line-height:1.5;}
+.gm-ex strong{color:var(--ink);font-family:var(--zh);}
+.glg-h{font-size:.7rem;color:var(--muted);font-weight:700;margin-bottom:7px;
+  display:flex;align-items:center;gap:7px;}
+.glg-h::after{content:'';flex:1;height:1px;background:var(--line);}
+.glg-grp{margin-bottom:18px;}
+
+/* ── INDEX ── */
+.iv{padding:24px 28px;}
+.iv-ti{font-family:var(--zh);font-size:1.4rem;font-weight:700;}
+.iv-su{color:var(--muted);font-size:.8rem;margin-top:3px;}
+.ibar{display:flex;gap:8px;margin:14px 0 18px;align-items:center;flex-wrap:wrap;}
+.iinput{flex:1;min-width:180px;padding:9px 14px;border:1.5px solid var(--line);
+  border-radius:var(--r2);font-family:inherit;font-size:.88rem;outline:none;
+  background:white;transition:border .2s;}
+.iinput:focus{border-color:var(--red);}
+.ifilters{display:flex;gap:5px;}
+.idf{padding:5px 11px;border-radius:14px;border:1.5px solid var(--line);
+  background:white;font-size:.7rem;font-weight:600;color:var(--muted);transition:all .15s;}
+.idf.on{background:var(--red);color:white;border-color:var(--red);}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:5px;}
+.ie{background:white;border-radius:var(--r2);padding:9px 12px;
+  display:flex;align-items:center;gap:9px;box-shadow:var(--sh);
+  cursor:pointer;transition:all .15s;border:1px solid transparent;}
+.ie:hover{border-color:var(--red);box-shadow:var(--sh2);}
+.ie-zh{font-family:var(--zh);font-size:1.1rem;font-weight:500;min-width:36px;}
+.ie-info{flex:1;min-width:0;}
+.ie-py{font-size:.68rem;color:var(--red);}
+.ie-th{font-size:.68rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ie-tag{font-size:.58rem;padding:2px 6px;border-radius:7px;color:white;font-weight:700;white-space:nowrap;flex-shrink:0;}
+
+/* ── STROKE MODAL ── */
+.smodal{position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;}
+.sbox{background:white;border-radius:16px;padding:20px;max-width:340px;width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.sm-hd{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.sm-char{font-family:var(--zh);font-size:2.2rem;font-weight:700;}
+.sm-info{flex:1;}
+.sm-py{color:var(--gold2);font-size:.95rem;}
+.sm-th{color:var(--blue);font-size:.8rem;margin-top:2px;}
+.sm-x{width:30px;height:30px;border-radius:50%;background:var(--p3);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;}
+.sm-x:hover{background:var(--p2);}
+.sm-cw{display:flex;justify-content:center;margin-bottom:14px;}
+#sm-svg{border:2px solid var(--line);border-radius:8px;background:#fffdf9;}
+.sm-btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.smbtn{padding:8px 14px;border-radius:18px;font-size:.78rem;font-weight:600;transition:all .2s;}
+.smbtn-a{background:var(--red);color:white;}.smbtn-a:hover{background:var(--red2);}
+.smbtn-q{background:var(--blue);color:white;}
+.smbtn-r{background:var(--green);color:white;}
+.smbtn-c{background:var(--p3);color:var(--ink);}
+.sm-msg{text-align:center;font-size:.75rem;color:var(--muted);margin-top:8px;min-height:18px;}
+
+/* ── MOBILE SIDEBAR ── */
+.sb-overlay{display:none;position:fixed;background:rgba(0,0,0,.45);z-index:250;
+  opacity:0;transition:opacity .25s;pointer-events:none;
+  left:0;right:0;bottom:0;top:52px;}
+.sb-overlay.open{opacity:1;pointer-events:auto;}
+.menu-btn{display:none;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.12);
+  color:white;font-size:1.25rem;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background .15s;}
+.menu-btn:hover{background:rgba(255,255,255,.22);}
+
+@media(max-width:700px){
+  .menu-btn{display:flex;}
+  .sb{
+    position:fixed;left:0;top:52px;height:calc(100% - 52px);z-index:260;
+    transform:translateX(-105%);transition:transform .27s cubic-bezier(.4,0,.2,1);
+    box-shadow:4px 0 24px rgba(0,0,0,.22);
+    display:block!important;
+    width:240px;min-width:240px;
+    overflow-y:auto;
+  }
+  .sb.open{transform:translateX(0);}
+  .sb-overlay{display:block;}
+}
+
+/* ── PRINT ── */
+.psheet{display:none;}
+@media print{
+  .nav,.sb,.lh-btns,.stroke-btn,.lh-btns *{display:none!important;}
+  body,html{background:white!important;height:auto!important;overflow:visible!important;}
+  .app,.wrap,.main{display:block!important;height:auto!important;overflow:visible!important;}
+  .view{display:none!important;}
+  .psheet{display:block!important;}
+  .ps-lesson{page-break-after:always;}
+  .ps-lesson:last-child{page-break-after:auto;}
+  .ps-hdr{padding:8px 14px;display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:10px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .ps-h-zh{font-family:var(--zh);font-size:13pt;font-weight:700;color:white;}
+  .ps-h-info{font-size:7.5pt;color:rgba(255,255,255,.85);text-align:right;}
+  .ps-instr{font-size:7pt;color:#666;margin-bottom:8px;padding:0 14px;}
+  .ps-word{padding:0 14px 6px;break-inside:avoid;page-break-inside:avoid;}
+  .ps-divider{height:0.5pt;background:#ddd;margin:5pt 14px;}
+  .ps-meta{font-size:7.5pt;margin-bottom:3pt;display:flex;gap:7pt;align-items:baseline;flex-wrap:wrap;}
+  .ps-zh{font-family:var(--zh);font-size:11pt;font-weight:700;}
+  .ps-py{color:#b01010;}
+  .ps-th{color:#1a5276;}
+  .ps-en{color:#555;}
+  /* TWO ROWS per word */
+  .ps-grid{display:flex;margin-bottom:2pt;}
+  .psc{width:28pt;height:28pt;border:0.4pt solid #aaa;flex-shrink:0;position:relative;}
+  /* Guide lines inside cell */
+  .psc::before{content:"";position:absolute;inset:0;
+    background:linear-gradient(rgba(0,0,0,.07) 0,rgba(0,0,0,.07) .4pt,transparent .4pt) center/0.4pt 100% no-repeat,
+               linear-gradient(to right,rgba(0,0,0,.07) 0,rgba(0,0,0,.07) .4pt,transparent .4pt) center/100% .4pt no-repeat,
+               linear-gradient(to bottom right,transparent calc(50% - .3pt),rgba(0,0,0,.05) 50%,transparent calc(50% + .3pt)),
+               linear-gradient(to bottom left,transparent calc(50% - .3pt),rgba(0,0,0,.05) 50%,transparent calc(50% + .3pt));}
+  .psc.model{background:#fff8f6!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .ps-mc{font-family:var(--zh);font-size:18pt;color:#b01010;
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-47%);
+    line-height:1;font-weight:400;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .ps-rl{position:absolute;top:1pt;left:1pt;font-size:4.5pt;color:#ccc;font-family:sans-serif;}
+}
+
+@media(max-width:700px){
+  .lw,.qw,.gv,.iv{padding:14px;}
+  .fc-big{font-size:3.5rem;}
+  .q-opts{grid-template-columns:1fr;}
+  .ntab{padding:5px 9px;font-size:.7rem;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="nav">
+  <button class="menu-btn" id="menuBtn" aria-label="เมนู">☰</button>
+  <div class="nav-brand">汉语 学习</div>
+  <div class="nav-tabs">
+    <button class="ntab on" data-view="lesson">📖 บทเรียน</button>
+    <button class="ntab" data-view="flashcard">🃏 Flashcard</button>
+    <button class="ntab" data-view="quiz">✏️ แบบทดสอบ</button>
+    <button class="ntab" data-view="grammar">📐 ไวยากรณ์</button>
+    <button class="ntab" data-view="index">🔍 ดัชนี</button>
+  </div>
+</nav>
+
+<div class="sb-overlay" id="sbOverlay"></div>
+<div class="wrap">
+<aside class="sb" id="sb"></aside>
+<main class="main">
+  <div class="view on" id="view-lesson"><div class="lw" id="lc"></div></div>
+  <div class="view" id="view-flashcard">
+    <div class="fcv">
+      <div class="fc-top">
+        <div class="fc-name" id="fcName"></div>
+        <div class="fc-modes">
+          <button class="fcm on" data-mode="zh2th">จีน→ไทย</button>
+          <button class="fcm" data-mode="th2zh">ไทย→จีน</button>
+          <button class="fcm" data-mode="py2zh">Pinyin→จีน</button>
+          <button class="fcm" data-mode="zh2en">จีน→อังกฤษ</button>
+        </div>
+        <div class="fc-dots" id="fcDots"></div>
+      </div>
+      <div class="fc-wrap">
+        <div class="fc-card" id="fcCard">
+          <div class="fc-front">
+            <div class="fc-big" id="fcFt"></div>
+            <div class="fc-hint">แตะ / กด ↑ เพื่อดูคำแปล</div>
+          </div>
+          <div class="fc-back">
+            <div class="fc-py" id="fcPy"></div>
+            <div class="fc-typ" id="fcTyp"></div>
+            <div class="fc-en" id="fcEn"></div>
+            <div class="fc-th" id="fcTh"></div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-ctrl">
+        <button class="fcb fcb-prev" id="fcPrev">← ก่อน</button>
+        <span class="fc-cnt" id="fcCnt">1/1</span>
+        <button class="fcb fcb-next" id="fcNext">ถัดไป →</button>
+      </div>
+      <div class="fc-kbd">
+        <span class="kbd">Space</span>/<span class="kbd">→</span> ถัดไป &nbsp;
+        <span class="kbd">←</span> ก่อน &nbsp; <span class="kbd">↑</span> พลิก
+      </div>
+    </div>
+  </div>
+  <div class="view" id="view-quiz">
+    <div class="qw">
+      <div style="margin-bottom:20px">
+        <div class="qh-ti">แบบทดสอบ</div>
+        <div class="qh-su" id="qSub">เลือกบทเรียนจาก sidebar</div>
+        <div class="qmodes">
+          <button class="qmode on" data-qm="c4">4 ตัวเลือก</button>
+          <button class="qmode" data-qm="fill">เติมคำ</button>
+          <button class="qmode" data-qm="dl">บทสนทนา</button>
+        </div>
+      </div>
+      <div class="qstat" id="qStat" style="display:none">
+        <span>ข้อ <strong id="qCur">1</strong>/<strong id="qTot">10</strong></span>
+        <span>✅ <span class="qsc" id="qSc">0</span></span>
+        <span>❌ <span id="qWr">0</span></span>
+      </div>
+      <div id="qArea"></div>
+    </div>
+  </div>
+  <div class="view" id="view-grammar">
+    <div class="gv">
+      <div style="margin-bottom:22px">
+        <div class="gv-ti">สรุปไวยากรณ์ทุกเล่ม</div>
+        <div class="gv-su">Grammar Summary · 汉语教程 1A/1B + 汉语口语速成 Threshold</div>
+      </div>
+      <div id="gc"></div>
+    </div>
+  </div>
+  <div class="view" id="view-index">
+    <div class="iv">
+      <div style="margin-bottom:14px">
+        <div class="iv-ti">ดัชนีคำศัพท์ทั้งหมด</div>
+        <div class="iv-su" id="ivSub"></div>
+      </div>
+      <div class="ibar">
+        <input class="iinput" id="iQ" type="text" placeholder="ค้นหา: จีน / พินอิน / ไทย / อังกฤษ...">
+        <div class="ifilters">
+          <button class="idf on" data-f="all">ทั้งหมด</button>
+          <button class="idf" data-f="hanyu_1a">1A</button>
+          <button class="idf" data-f="hanyu_1b">1B</button>
+          <button class="idf" data-f="speaking">Speaking</button>
+        </div>
+      </div>
+      <div class="igrid" id="ig"></div>
+    </div>
+  </div>
+  <div class="psheet" id="psheet"></div>
+</main>
+</div>
+</div>
+
+<!-- STROKE MODAL -->
+<div class="smodal" id="smodal" style="display:none">
+  <div class="sbox">
+    <div class="sm-hd">
+      <div class="sm-char" id="smC"></div>
+      <div class="sm-info"><div class="sm-py" id="smP"></div><div class="sm-th" id="smT"></div></div>
+      <div class="sm-x" onclick="closeStroke()">✕</div>
+    </div>
+    <div class="sm-cw"><svg id="sm-svg" width="180" height="180"></svg></div>
+    <div class="sm-btns">
+      <button class="smbtn smbtn-a" id="smAnim">▶ แสดงลำดับขีด</button>
+      <button class="smbtn smbtn-q" id="smQuiz">✏️ ฝึกเขียน</button>
+      <button class="smbtn smbtn-r" id="smReset">↺ รีเซ็ต</button>
+    </div>
+    <div class="sm-msg" id="smMsg"></div>
+  </div>
+</div>
+
+<script>
+const D={"books":{"hanyu_1a":{"name":"汉语教程 第一册上","name_en":"Hanyu Jiaocheng Book 1A","name_th":"ฮั่นอวี่เจี้ยวเฉิง เล่ม 1A","color":"#27ae60","lessons":{"1":{"title":"你好","title_en":"Hello","dialogue":[{"speaker":"A","zh":"你好！","py":"Nǐ hǎo!","en":"Hello!","th":"สวัสดี!"},{"speaker":"B","zh":"你好！","py":"Nǐ hǎo!","en":"Hello!","th":"สวัสดี!"}],"grammar":[{"rule":"你好 greeting","zh":"你好！/ 您好！","en":"Standard greeting — 你好 (informal) / 您好 (formal/respectful)","example":"你好！= Hello! / 您好！= Hello (respectful)","th":"คำทักทาย: 你好 (ทั่วไป) / 您好 (สุภาพ)"}],"key_sentences":["你好！= สวัสดี (ทักทายทั่วไป)"],"vocab":[{"zh":"你","py":"nǐ","type":"代","en":"you","th":"คุณ"},{"zh":"好","py":"hǎo","type":"形","en":"good; fine","th":"ดี"},{"zh":"你好","py":"nǐ hǎo","type":"","en":"Hello","th":"สวัสดี"},{"zh":"一","py":"yī","type":"数","en":"one","th":"หนึ่ง"},{"zh":"五","py":"wǔ","type":"数","en":"five","th":"ห้า"},{"zh":"八","py":"bā","type":"数","en":"eight","th":"แปด"},{"zh":"大","py":"dà","type":"形","en":"big","th":"ใหญ่"},{"zh":"不","py":"bù","type":"副","en":"not","th":"ไม่"},{"zh":"口","py":"kǒu","type":"名/量","en":"mouth; (measure word for family members)","th":"ปาก; (ลักษณนาม)"},{"zh":"白","py":"bái","type":"形","en":"white","th":"สีขาว"},{"zh":"女","py":"nǚ","type":"形","en":"female","th":"ผู้หญิง"},{"zh":"马","py":"mǎ","type":"名","en":"horse","th":"ม้า"}],"exercises":[{"type":"match","q":"你好","a":"สวัสดี"},{"type":"fill","q":"你___！(ทักทาย)","a":"好"},{"type":"translate","q":"Hello! (จีน)","a":"你好！"}]},"2":{"title":"汉语不太难","title_en":"Chinese is not very difficult","dialogue":[{"speaker":"A","zh":"你忙吗？","py":"Nǐ máng ma?","en":"Are you busy?","th":"คุณยุ่งไหม?"},{"speaker":"B","zh":"很忙。","py":"Hěn máng.","en":"Very busy.","th":"ยุ่งมาก"},{"speaker":"A","zh":"汉语难吗？","py":"Hànyǔ nán ma?","en":"Is Chinese difficult?","th":"ภาษาจีนยากไหม?"},{"speaker":"B","zh":"不太难。","py":"Bú tài nán.","en":"Not very difficult.","th":"ไม่ค่อยยาก"}],"grammar":[{"rule":"吗-question","zh":"S + Adj + 吗？","en":"Yes/No question using 吗","example":"你忙吗？= Are you busy?","th":"ประโยคคำถามใช้ 吗 ต่อท้าย"},{"rule":"副词很","zh":"很 + Adj","en":"很 (very) modifies adjectives","example":"很忙 = very busy","th":"很 วางหน้าคำคุณศัพท์"},{"rule":"否定不","zh":"不 + Adj/V","en":"Negation with 不","example":"不太难 = not very difficult","th":"ปฏิเสธด้วย 不"}],"key_sentences":["太...了 = too... (เกินไป)","不太 + Adj = ไม่ค่อย..."],"vocab":[{"zh":"忙","py":"máng","type":"形","en":"busy","th":"ยุ่ง"},{"zh":"吗","py":"ma","type":"助","en":"question particle","th":"อนุภาคคำถาม"},{"zh":"很","py":"hěn","type":"副","en":"very","th":"มาก"},{"zh":"汉语","py":"Hànyǔ","type":"名","en":"Chinese language","th":"ภาษาจีน"},{"zh":"难","py":"nán","type":"形","en":"difficult","th":"ยาก"},{"zh":"太","py":"tài","type":"副","en":"too; excessively","th":"เกินไป"},{"zh":"爸爸","py":"bàba","type":"名","en":"dad","th":"พ่อ"},{"zh":"妈妈","py":"māma","type":"名","en":"mum","th":"แม่"},{"zh":"他","py":"tā","type":"代","en":"he; him","th":"เขา (ชาย)"},{"zh":"她","py":"tā","type":"代","en":"she; her","th":"เธอ (หญิง)"},{"zh":"男","py":"nán","type":"形","en":"male","th":"ผู้ชาย"},{"zh":"哥哥","py":"gēge","type":"名","en":"elder brother","th":"พี่ชาย"},{"zh":"弟弟","py":"dìdi","type":"名","en":"younger brother","th":"น้องชาย"},{"zh":"妹妹","py":"mèimei","type":"名","en":"younger sister","th":"น้องสาว"}],"exercises":[{"type":"fill","q":"汉语___吗？(ยาก)","a":"难"},{"type":"translate","q":"ยุ่งมาก (จีน)","a":"很忙"},{"type":"choose","q":"ปฏิเสธ 难 ใช้อะไร?","options":["不","没","别"],"a":"不"}]},"3":{"title":"明天见","title_en":"See you tomorrow","dialogue":[{"speaker":"A","zh":"你学英语吗？","py":"Nǐ xué Yīngyǔ ma?","en":"Do you study English?","th":"คุณเรียนภาษาอังกฤษไหม?"},{"speaker":"B","zh":"不，学汉语。","py":"Bù, xué Hànyǔ.","en":"No, (I study) Chinese.","th":"ไม่ เรียนภาษาจีน"},{"speaker":"A","zh":"去北京吗？","py":"Qù Běijīng ma?","en":"Are you going to Beijing?","th":"ไปปักกิ่งไหม?"},{"speaker":"B","zh":"对。","py":"Duì.","en":"Right.","th":"ถูกต้อง"},{"speaker":"A","zh":"明天见！","py":"Míngtiān jiàn!","en":"See you tomorrow!","th":"แล้วพบกันพรุ่งนี้!"},{"speaker":"B","zh":"明天见！","py":"Míngtiān jiàn!","en":"See you tomorrow!","th":"แล้วพบกันพรุ่งนี้!"}],"grammar":[{"rule":"动词谓语句","zh":"S + V (+ O)","en":"Verb predicate sentence","example":"我去银行。= I go to the bank.","th":"ประโยคที่กริยาเป็นภาคแสดง"},{"rule":"省略主语","zh":"Context allows subject omission","en":"Subject can be omitted when context is clear","example":"(我)去银行。","th":"ละประธานได้เมื่อบริบทชัดเจน"}],"key_sentences":["明天见 = แล้วพบกัน (ลา)","对 = ถูกต้อง (ยืนยัน)"],"vocab":[{"zh":"学","py":"xué","type":"动","en":"to study; to learn","th":"เรียน"},{"zh":"英语","py":"Yīngyǔ","type":"名","en":"English","th":"ภาษาอังกฤษ"},{"zh":"去","py":"qù","type":"动","en":"to go","th":"ไป"},{"zh":"对","py":"duì","type":"形","en":"correct; right","th":"ถูก"},{"zh":"邮局","py":"yóujú","type":"名","en":"post office","th":"ที่ทำการไปรษณีย์"},{"zh":"寄","py":"jì","type":"动","en":"to mail","th":"ส่งจดหมาย"},{"zh":"信","py":"xìn","type":"名","en":"letter","th":"จดหมาย"},{"zh":"银行","py":"yínháng","type":"名","en":"bank","th":"ธนาคาร"},{"zh":"取","py":"qǔ","type":"动","en":"to withdraw","th":"ถอน"},{"zh":"钱","py":"qián","type":"名","en":"money","th":"เงิน"},{"zh":"明天","py":"míngtiān","type":"名","en":"tomorrow","th":"พรุ่งนี้"},{"zh":"见","py":"jiàn","type":"动","en":"to see","th":"พบ"},{"zh":"六","py":"liù","type":"数","en":"six","th":"หก"},{"zh":"七","py":"qī","type":"数","en":"seven","th":"เจ็ด"},{"zh":"九","py":"jiǔ","type":"数","en":"nine","th":"เก้า"}],"exercises":[{"type":"translate","q":"See you tomorrow! (จีน)","a":"明天见！"},{"type":"fill","q":"你___什么？(เรียน)","a":"学"},{"type":"match","q":"银行","a":"ธนาคาร"}]},"4":{"title":"你去哪儿","title_en":"Where are you going","dialogue":[{"speaker":"A","zh":"今天星期几？","py":"Jīntiān xīngqī jǐ?","en":"What day is today?","th":"วันนี้วันอะไร?"},{"speaker":"B","zh":"今天星期二。","py":"Jīntiān Xīngqī'èr.","en":"Today is Tuesday.","th":"วันนี้วันอังคาร"},{"speaker":"A","zh":"你去哪儿？","py":"Nǐ qù nǎr?","en":"Where are you going?","th":"คุณจะไปไหน?"},{"speaker":"B","zh":"我去天安门，你去不去？","py":"Wǒ qù Tiān'ānMén, nǐ qù bu qù?","en":"I'm going to Tian'anmen, are you going?","th":"ฉันไปเทียนอันเหมิน คุณไปด้วยไหม?"},{"speaker":"A","zh":"不去，我回学校。","py":"Bú qù, wǒ huí xuéxiào.","en":"No, I'm going back to school.","th":"ไม่ไป ฉันกลับโรงเรียน"},{"speaker":"B","zh":"再见！","py":"Zàijiàn!","en":"Goodbye!","th":"ลาก่อน!"}],"grammar":[{"rule":"正反问句","zh":"V + 不 + V？","en":"Affirmative-negative question","example":"你去不去？= Are you going or not?","th":"คำถามยืนยัน-ปฏิเสธ"},{"rule":"星期说法","zh":"星期 + 数字","en":"Days of the week","example":"星期一=Mon, 星期二=Tue, 星期天=Sun","th":"วันในสัปดาห์"},{"rule":"哪儿/那儿","zh":"哪儿 = where? / 那儿 = there","en":"Question vs demonstrative pronoun","example":"你去哪儿？我去那儿。","th":"哪儿=ที่ไหน / 那儿=ที่นั่น"}],"key_sentences":["星期几? = วันอะไร?","V + 不 + V = ...ไหม? (ถามทางเลือก)"],"vocab":[{"zh":"今天","py":"jīntiān","type":"名","en":"today","th":"วันนี้"},{"zh":"星期","py":"xīngqī","type":"名","en":"week","th":"สัปดาห์"},{"zh":"几","py":"jǐ","type":"代","en":"how many","th":"กี่"},{"zh":"二","py":"èr","type":"数","en":"two","th":"สอง"},{"zh":"三","py":"sān","type":"数","en":"three","th":"สาม"},{"zh":"四","py":"sì","type":"数","en":"four","th":"สี่"},{"zh":"哪儿","py":"nǎr","type":"代","en":"where","th":"ที่ไหน"},{"zh":"我","py":"wǒ","type":"代","en":"I; me","th":"ฉัน"},{"zh":"回","py":"huí","type":"动","en":"to return","th":"กลับ"},{"zh":"学校","py":"xuéxiào","type":"名","en":"school","th":"โรงเรียน"},{"zh":"再见","py":"zàijiàn","type":"动","en":"goodbye","th":"ลาก่อน"},{"zh":"对不起","py":"duìbuqǐ","type":"动","en":"sorry","th":"ขอโทษ"},{"zh":"没关系","py":"méi guānxi","type":"","en":"never mind","th":"ไม่เป็นไร"}],"exercises":[{"type":"fill","q":"你去___？(ที่ไหน)","a":"哪儿"},{"type":"build","q":"สร้างประโยค: คุณไปไหม? (去)","a":"你去不去？"},{"type":"translate","q":"Goodbye! (จีน)","a":"再见！"}]},"5":{"title":"这是王老师","title_en":"This is Mr. Wang","dialogue":[{"speaker":"A","zh":"请问，您贵姓？","py":"Qǐngwèn, nín guì xìng?","en":"May I ask your surname?","th":"ขอถามหน่อย ท่านแซ่อะไร?"},{"speaker":"B","zh":"我姓王，叫王明。你叫什么名字？","py":"Wǒ xìng Wáng, jiào Wáng Míng. Nǐ jiào shénme míngzi?","en":"My surname is Wang, my name is Wang Ming. What's your name?","th":"ฉันแซ่หวาง ชื่อหวางหมิง คุณชื่ออะไร?"},{"speaker":"A","zh":"我叫李小红。认识您，很高兴。","py":"Wǒ jiào Lǐ Xiǎohóng. Rènshi nín, hěn gāoxìng.","en":"I'm Li Xiaohong. Nice to meet you.","th":"ฉันชื่อหลี่เสี่ยวหง ยินดีที่ได้รู้จัก"}],"grammar":[{"rule":"姓名问法","zh":"您贵姓？/ 你叫什么名字？","en":"Asking someone's name (formal/informal)","example":"贵姓 = formal; 叫什么名字 = informal","th":"ถามชื่อ: แบบสุภาพ vs ทั่วไป"},{"rule":"认识+人","zh":"认识 + person","en":"To know/meet someone","example":"认识您，很高兴。","th":"รู้จัก + คน"}],"key_sentences":["这是...= นี่คือ...","请问 = ขอถาม (สุภาพ)","认识你，很高兴 = ยินดีที่ได้รู้จัก"],"vocab":[{"zh":"这","py":"zhè","type":"代","en":"this","th":"นี่"},{"zh":"是","py":"shì","type":"动","en":"to be","th":"เป็น; คือ"},{"zh":"老师","py":"lǎoshī","type":"名","en":"teacher","th":"ครู"},{"zh":"请问","py":"qǐngwèn","type":"","en":"May I ask...","th":"ขอถามหน่อย"},{"zh":"贵姓","py":"guìxìng","type":"","en":"Your surname? (polite)","th":"ท่านแซ่อะไร"},{"zh":"姓","py":"xìng","type":"动/名","en":"surname; to be surnamed","th":"นามสกุล"},{"zh":"叫","py":"jiào","type":"动","en":"to be called","th":"ชื่อ"},{"zh":"名字","py":"míngzi","type":"名","en":"name","th":"ชื่อ"},{"zh":"认识","py":"rènshi","type":"动","en":"to know; to recognize","th":"รู้จัก"},{"zh":"高兴","py":"gāoxìng","type":"形","en":"happy; glad","th":"ดีใจ"},{"zh":"也","py":"yě","type":"副","en":"also; too","th":"ด้วย"},{"zh":"呢","py":"ne","type":"助","en":"and (you)?","th":"แล้ว...ล่ะ?"},{"zh":"不客气","py":"bú kèqi","type":"","en":"you're welcome","th":"ไม่เป็นไร"}],"exercises":[{"type":"fill","q":"这___王老师。(เป็น)","a":"是"},{"type":"translate","q":"Nice to meet you. (จีน)","a":"认识你，很高兴。"},{"type":"choose","q":"ถามชื่ออย่างสุภาพ","options":["你叫什么？","您贵姓？","你是谁？"],"a":"您贵姓？"}]},"6":{"title":"你是哪国人","title_en":"Where are you from","dialogue":[{"speaker":"A","zh":"你是哪国人？","py":"Nǐ shì nǎ guó rén?","en":"Which country are you from?","th":"คุณเป็นคนชาติไหน?"},{"speaker":"B","zh":"我是泰国人。你呢？","py":"Wǒ shì Tàiguó rén. Nǐ ne?","en":"I'm Thai. And you?","th":"ฉันเป็นคนไทย แล้วคุณล่ะ?"},{"speaker":"A","zh":"我是中国人。你在哪里学习？","py":"Wǒ shì Zhōngguórén. Nǐ zài nǎlǐ xuéxí?","en":"I'm Chinese. Where do you study?","th":"ฉันเป็นคนจีน คุณเรียนที่ไหน?"},{"speaker":"B","zh":"我在北京大学学习汉语。","py":"Wǒ zài Běijīng Dàxué xuéxí Hànyǔ.","en":"I study Chinese at Peking University.","th":"ฉันเรียนภาษาจีนที่มหาวิทยาลัยปักกิ่ง"}],"grammar":[{"rule":"是字句","zh":"S + 是 + N","en":"Noun predicate with 是","example":"我是泰国人。= I am Thai.","th":"ประโยค 是 (S + 是 + N)"},{"rule":"在+地点","zh":"在 + place + V","en":"Action at a location","example":"在北京大学学习 = study at Peking University","th":"在 + สถานที่ + กริยา"},{"rule":"哪国人","zh":"哪 + 量词 + 名词","en":"Which + measure + noun","example":"哪国人？= which country's person?","th":"哪 + ลักษณนาม + คำนาม"}],"key_sentences":["你是哪国人？= คุณเป็นคนชาติไหน?","我是___人 = ฉันเป็นคน___","在 + ที่ + เรียน/ทำงาน"],"vocab":[{"zh":"哪","py":"nǎ","type":"代","en":"which","th":"ไหน"},{"zh":"国","py":"guó","type":"名","en":"country","th":"ประเทศ"},{"zh":"人","py":"rén","type":"名","en":"person","th":"คน"},{"zh":"中国","py":"Zhōngguó","type":"名","en":"China","th":"จีน"},{"zh":"美国","py":"Měiguó","type":"名","en":"USA","th":"สหรัฐฯ"},{"zh":"泰国","py":"Tàiguó","type":"名","en":"Thailand","th":"ไทย"},{"zh":"日本","py":"Rìběn","type":"名","en":"Japan","th":"ญี่ปุ่น"},{"zh":"韩国","py":"Hánguó","type":"名","en":"Korea","th":"เกาหลี"},{"zh":"在","py":"zài","type":"动/介","en":"at; in; to be at","th":"อยู่ที่"},{"zh":"哪里","py":"nǎlǐ","type":"代","en":"where","th":"ที่ไหน"},{"zh":"留学生","py":"liúxuéshēng","type":"名","en":"international student","th":"นักศึกษาต่างชาติ"},{"zh":"大学","py":"dàxué","type":"名","en":"university","th":"มหาวิทยาลัย"},{"zh":"学生","py":"xuésheng","type":"名","en":"student","th":"นักเรียน"}],"exercises":[{"type":"fill","q":"你是___国人？","a":"哪"},{"type":"translate","q":"I am Thai. (จีน)","a":"我是泰国人。"},{"type":"build","q":"สร้าง: คุณเรียนที่ไหน?","a":"你在哪里学习？"}]},"7":{"title":"你吃什么","title_en":"What would you like to eat","dialogue":[{"speaker":"A","zh":"中午你吃什么？","py":"Zhōngwǔ nǐ chī shénme?","en":"What are you eating for lunch?","th":"เที่ยงคุณกินอะไร?"},{"speaker":"B","zh":"我去食堂吃。要一个馒头，一碗米饭。","py":"Wǒ qù shítáng chī. Yào yī ge mántou, yī wǎn mǐfàn.","en":"I'll eat at the cafeteria. I want one steamed bun and a bowl of rice.","th":"ฉันไปกินที่โรงอาหาร จะเอาซาลาเปาหนึ่งอัน ข้าวหนึ่งชาม"},{"speaker":"A","zh":"你喝茶还是喝咖啡？","py":"Nǐ hē chá háishi hē kāfēi?","en":"Do you drink tea or coffee?","th":"คุณดื่มชาหรือกาแฟ?"},{"speaker":"B","zh":"我喝茶。","py":"Wǒ hē chá.","en":"I drink tea.","th":"ฉันดื่มชา"}],"grammar":[{"rule":"还是选择问","zh":"A + 还是 + B?","en":"Or-question (choice)","example":"喝茶还是喝咖啡？= tea or coffee?","th":"คำถามทางเลือก: A หรือ B?"},{"rule":"量词用法","zh":"数 + 量 + 名","en":"Number + measure + noun","example":"一个馒头, 一碗米饭","th":"ตัวเลข + ลักษณนาม + คำนาม"},{"rule":"要+O","zh":"要 + N","en":"Want / need something","example":"我要一杯茶。= I want a cup of tea.","th":"要 + สิ่งของ = ต้องการ..."}],"key_sentences":["你吃什么？= คุณกินอะไร?","还是 = หรือ (คำถามทางเลือก)","数量词: 一个/一碗/一杯"],"vocab":[{"zh":"中午","py":"zhōngwǔ","type":"名","en":"noon","th":"เที่ยง"},{"zh":"吃","py":"chī","type":"动","en":"to eat","th":"กิน"},{"zh":"食堂","py":"shítáng","type":"名","en":"cafeteria","th":"โรงอาหาร"},{"zh":"馒头","py":"mántou","type":"名","en":"steamed bun","th":"ซาลาเปาไม่มีไส้"},{"zh":"要","py":"yào","type":"动","en":"to want","th":"ต้องการ"},{"zh":"个","py":"gè","type":"量","en":"(general measure word)","th":"ลักษณนามทั่วไป"},{"zh":"米饭","py":"mǐfàn","type":"名","en":"cooked rice","th":"ข้าว"},{"zh":"什么","py":"shénme","type":"代","en":"what","th":"อะไร"},{"zh":"包子","py":"bāozi","type":"名","en":"stuffed bun","th":"ซาลาเปามีไส้"},{"zh":"面条","py":"miàntiáo","type":"名","en":"noodles","th":"เส้นหมี่"},{"zh":"喝","py":"hē","type":"动","en":"to drink","th":"ดื่ม"},{"zh":"茶","py":"chá","type":"名","en":"tea","th":"ชา"},{"zh":"水","py":"shuǐ","type":"名","en":"water","th":"น้ำ"},{"zh":"还是","py":"háishi","type":"连","en":"or (in questions)","th":"หรือ"},{"zh":"咖啡","py":"kāfēi","type":"名","en":"coffee","th":"กาแฟ"}],"exercises":[{"type":"choose","q":"เลือกระหว่าง A และ B ใช้คำอะไร?","options":["或者","还是","和"],"a":"还是"},{"type":"fill","q":"我___一个包子。(ต้องการ)","a":"要"},{"type":"build","q":"สร้าง: กินข้าว (eat rice)","a":"吃米饭"}]},"8":{"title":"你家有几口人","title_en":"How many in your family","dialogue":[{"speaker":"A","zh":"你家有几口人？","py":"Nǐ jiā yǒu jǐ kǒu rén?","en":"How many people are in your family?","th":"ครอบครัวคุณมีกี่คน?"},{"speaker":"B","zh":"我家有五口人。爸爸、妈妈、哥哥、姐姐和我。","py":"Wǒ jiā yǒu wǔ kǒu rén. Bàba, māma, gēge, jiějie hé wǒ.","en":"5 people. Dad, mom, elder brother, elder sister and me.","th":"มีห้าคน พ่อ แม่ พี่ชาย พี่สาว และฉัน"},{"speaker":"A","zh":"你爸爸工作吗？","py":"Nǐ bàba gōngzuò ma?","en":"Does your dad work?","th":"พ่อของคุณทำงานไหม?"},{"speaker":"B","zh":"工作。他在一家公司工作。","py":"Gōngzuò. Tā zài yī jiā gōngsī gōngzuò.","en":"Yes. He works at a company.","th":"ทำงาน เขาทำงานในบริษัทหนึ่ง"}],"grammar":[{"rule":"有字句","zh":"S + 有 + O","en":"Possession with 有","example":"我家有五口人。= My family has 5 people.","th":"ประโยค 有 แสดงการมีอยู่"},{"rule":"几vs多少","zh":"几 (small number) vs 多少 (any number)","en":"几 for small numbers, 多少 for any","example":"几口人？(family); 多少人？(crowd)","th":"几 สำหรับจำนวนน้อย, 多少 สำหรับทุกจำนวน"}],"key_sentences":["你家有几口人？= ครอบครัวมีกี่คน?","有 = มี (ครอบครอง)","在 + บริษัท/ที่ + ทำงาน"],"vocab":[{"zh":"家","py":"jiā","type":"名/量","en":"family; home","th":"บ้าน; ครอบครัว"},{"zh":"有","py":"yǒu","type":"动","en":"to have; there is","th":"มี"},{"zh":"两","py":"liǎng","type":"数","en":"two (before measure word)","th":"สอง (ก่อนลักษณนาม)"},{"zh":"姐姐","py":"jiějie","type":"名","en":"elder sister","th":"พี่สาว"},{"zh":"工作","py":"gōngzuò","type":"动/名","en":"to work; job","th":"ทำงาน; งาน"},{"zh":"公司","py":"gōngsī","type":"名","en":"company","th":"บริษัท"},{"zh":"都","py":"dōu","type":"副","en":"all; both","th":"ทั้งหมด"},{"zh":"十","py":"shí","type":"数","en":"ten","th":"สิบ"},{"zh":"吧","py":"ba","type":"助","en":"particle (suggestion)","th":"อนุภาคแสดงข้อเสนอ"}],"exercises":[{"type":"fill","q":"你家___几口人？(มี)","a":"有"},{"type":"translate","q":"My family has 4 people. (จีน)","a":"我家有四口人。"},{"type":"choose","q":"ถามจำนวนคนในครอบครัว ใช้อะไร?","options":["多少","几","哪"],"a":"几"}]},"9":{"title":"这件衬衫多少钱","title_en":"How much is this shirt","dialogue":[{"speaker":"A","zh":"这件衬衫多少钱？","py":"Zhè jiàn chènshān duōshao qián?","en":"How much is this shirt?","th":"เสื้อเชิ้ตนี้ราคาเท่าไหร่?"},{"speaker":"B","zh":"三百五十块钱。","py":"Sānbǎi wǔshí kuài qián.","en":"350 yuan.","th":"สามร้อยห้าสิบหยวน"},{"speaker":"A","zh":"太贵了！便宜一点儿？","py":"Tài guì le! Piányī yīdiǎnr?","en":"Too expensive! A little cheaper?","th":"แพงเกินไป! ถูกหน่อยได้ไหม?"},{"speaker":"B","zh":"三百块，这是最低价了。","py":"Sānbǎi kuài, zhè shì zuì dī jià le.","en":"300 yuan, this is the lowest price.","th":"สามร้อยหยวน นี่ราคาต่ำสุดแล้ว"}],"grammar":[{"rule":"多少钱","zh":"多少钱？= How much?","en":"Asking price","example":"这件衬衫多少钱？= How much is this shirt?","th":"ถามราคา: 多少钱?"},{"rule":"太...了","zh":"太 + Adj + 了","en":"Too/very + adjective","example":"太贵了！= Too expensive!","th":"太...了 = ...เกินไป!"},{"rule":"钱的说法","zh":"元/块, 角/毛, 分","en":"Chinese money: yuan, jiao, fen","example":"三块五 = 3.5 yuan","th":"เงินจีน: หยวน เจี่ยว เฝิน"}],"key_sentences":["多少钱？= ราคาเท่าไหร่?","太贵了 = แพงเกินไป","便宜一点儿 = ถูกหน่อย"],"vocab":[{"zh":"件","py":"jiàn","type":"量","en":"(measure for clothes)","th":"(ลักษณนามสำหรับเสื้อผ้า)"},{"zh":"衬衫","py":"chènshān","type":"名","en":"shirt","th":"เสื้อเชิ้ต"},{"zh":"多少","py":"duōshao","type":"代","en":"how much/many","th":"เท่าไหร่"},{"zh":"百","py":"bǎi","type":"数","en":"hundred","th":"ร้อย"},{"zh":"块","py":"kuài","type":"量","en":"yuan (colloquial)","th":"หยวน (พูดทั่วไป)"},{"zh":"毛","py":"máo","type":"量","en":"jiao (0.1 yuan)","th":"เจี่ยว"},{"zh":"便宜","py":"piányi","type":"形","en":"cheap","th":"ถูก"},{"zh":"贵","py":"guì","type":"形","en":"expensive","th":"แพง"},{"zh":"颜色","py":"yánsè","type":"名","en":"color","th":"สี"},{"zh":"红","py":"hóng","type":"形","en":"red","th":"แดง"},{"zh":"黄","py":"huáng","type":"形","en":"yellow","th":"เหลือง"},{"zh":"蓝","py":"lán","type":"形","en":"blue","th":"น้ำเงิน"},{"zh":"黑","py":"hēi","type":"形","en":"black","th":"ดำ"},{"zh":"号","py":"hào","type":"名/量","en":"number; size","th":"หมายเลข; ไซส์"}],"exercises":[{"type":"fill","q":"___件衬衫多少钱？(นี่)","a":"这"},{"type":"translate","q":"Too expensive! (จีน)","a":"太贵了！"},{"type":"calc","q":"三块五 = ? บาท (1 หยวน = 5 บาท)","a":"17.5 บาท (3.5 หยวน × 5)"}]},"10":{"title":"你的房间怎么样","title_en":"How is your room","dialogue":[{"speaker":"A","zh":"你的房间怎么样？","py":"Nǐ de fángjiān zěnmeyàng?","en":"How is your room?","th":"ห้องของคุณเป็นอย่างไร?"},{"speaker":"B","zh":"我的房间不大，但很干净整齐。","py":"Wǒ de fángjiān bù dà, dàn hěn gānjìng zhěngqí.","en":"My room is not big, but very clean and tidy.","th":"ห้องฉันไม่ใหญ่ แต่สะอาดและเป็นระเบียบ"},{"speaker":"A","zh":"桌子上有什么？","py":"Zhuōzi shàng yǒu shénme?","en":"What's on the desk?","th":"บนโต๊ะมีอะไร?"},{"speaker":"B","zh":"有书、笔和词典。","py":"Yǒu shū, bǐ hé cídiǎn.","en":"There are books, pens and a dictionary.","th":"มีหนังสือ ปากกา และพจนานุกรม"}],"grammar":[{"rule":"怎么样","zh":"S + 怎么样？","en":"How is/are...?","example":"你的房间怎么样？= How's your room?","th":"...เป็นอย่างไร?"},{"rule":"方位词","zh":"上/下/里/外/旁边","en":"Positional words","example":"桌子上 = on the desk; 书包里 = in the bag","th":"คำบอกตำแหน่ง: บน/ล่าง/ใน/นอก"},{"rule":"存在句","zh":"Place + 有 + thing","en":"Existence: there is/are at a place","example":"桌子上有书。= There are books on the desk.","th":"ประโยคมีอยู่: ที่ + 有 + สิ่งของ"}],"key_sentences":["怎么样？= เป็นอย่างไร?","地点 + 有 + 东西 = ที่...มี...","的 แสดงความเป็นเจ้าของ"],"vocab":[{"zh":"房间","py":"fángjiān","type":"名","en":"room","th":"ห้อง"},{"zh":"怎么样","py":"zěnmeyàng","type":"代","en":"how; how about","th":"เป็นอย่างไร"},{"zh":"干净","py":"gānjìng","type":"形","en":"clean","th":"สะอาด"},{"zh":"整齐","py":"zhěngqí","type":"形","en":"tidy; neat","th":"เป็นระเบียบ"},{"zh":"桌子","py":"zhuōzi","type":"名","en":"desk; table","th":"โต๊ะ"},{"zh":"椅子","py":"yǐzi","type":"名","en":"chair","th":"เก้าอี้"},{"zh":"床","py":"chuáng","type":"名","en":"bed","th":"เตียง"},{"zh":"书","py":"shū","type":"名","en":"book","th":"หนังสือ"},{"zh":"上","py":"shàng","type":"名","en":"on; above","th":"บน"},{"zh":"下","py":"xià","type":"名","en":"under; below","th":"ล่าง"},{"zh":"里","py":"lǐ","type":"名","en":"inside; in","th":"ใน"}],"exercises":[{"type":"fill","q":"桌子___有书。(บน)","a":"上"},{"type":"translate","q":"How is your room? (จีน)","a":"你的房间怎么样？"},{"type":"build","q":"สร้าง: ในห้องมีเตียง","a":"房间里有床。"}]},"11":{"title":"她是我的汉语老师","title_en":"She is my Chinese teacher","dialogue":[{"speaker":"A","zh":"那位是谁？","py":"Nà wèi shì shéi?","en":"Who is that?","th":"คนนั้นคือใคร?"},{"speaker":"B","zh":"她是我的汉语老师，她叫李老师。","py":"Tā shì wǒ de Hànyǔ lǎoshī, tā jiào Lǐ lǎoshī.","en":"She's my Chinese teacher, her name is Teacher Li.","th":"เธอเป็นครูสอนภาษาจีนของฉัน เธอชื่อครูหลี่"},{"speaker":"A","zh":"你们班有多少学生？","py":"Nǐmen bān yǒu duōshao xuésheng?","en":"How many students are in your class?","th":"ในชั้นของคุณมีนักเรียนกี่คน?"},{"speaker":"B","zh":"有二十个学生，我们都是留学生。","py":"Yǒu èrshí gè xuésheng, wǒmen dōu shì liúxuéshēng.","en":"There are 20 students, we're all international students.","th":"มียี่สิบคน พวกเราเป็นนักศึกษาต่างชาติทุกคน"}],"grammar":[{"rule":"谁","zh":"谁 = who?","en":"Question word for person","example":"那位是谁？= Who is that?","th":"谁 = ใคร?"},{"rule":"都","zh":"都 + V/Adj","en":"All/both (modifies predicate)","example":"我们都是留学生。= We are all international students.","th":"都 = ทั้งหมด (วางหน้ากริยา)"},{"rule":"多少+名词","zh":"多少 + 名","en":"How many + noun (any quantity)","example":"多少学生？= how many students?","th":"多少 + คำนาม = กี่...?"}],"key_sentences":["谁 = ใคร?","都 = ทั้งหมด (วางหน้ากริยา)","的 ใช้แสดงความเป็นเจ้าของ"],"vocab":[{"zh":"的","py":"de","type":"助","en":"(possessive particle)","th":"อนุภาคแสดงความเป็นเจ้าของ"},{"zh":"和","py":"hé","type":"连","en":"and","th":"และ"},{"zh":"们","py":"men","type":"助","en":"(plural suffix)","th":"คำต่อท้ายพหูพจน์"},{"zh":"我们","py":"wǒmen","type":"代","en":"we; us","th":"พวกเรา"},{"zh":"你们","py":"nǐmen","type":"代","en":"you (plural)","th":"พวกคุณ"},{"zh":"他们","py":"tāmen","type":"代","en":"they","th":"พวกเขา"},{"zh":"年级","py":"niánjí","type":"名","en":"grade; year","th":"ชั้นปี"},{"zh":"专业","py":"zhuānyè","type":"名","en":"major","th":"วิชาเอก"},{"zh":"帮助","py":"bāngzhù","type":"动/名","en":"to help","th":"ช่วย"}],"exercises":[{"type":"fill","q":"我们___是学生。(ทั้งหมด)","a":"都"},{"type":"translate","q":"Who is that? (จีน)","a":"那位是谁？"},{"type":"choose","q":"พหูพจน์ต่อท้าย","options":["了","们","的"],"a":"们"}]},"12":{"title":"你的爱好是什么","title_en":"What is your hobby","dialogue":[{"speaker":"A","zh":"你的爱好是什么？","py":"Nǐ de àihào shì shénme?","en":"What is your hobby?","th":"งานอดิเรกของคุณคืออะไร?"},{"speaker":"B","zh":"我喜欢唱歌、跳舞，还喜欢游泳。你呢？","py":"Wǒ xǐhuan chàng gē, tiào wǔ, hái xǐhuan yóuyǒng. Nǐ ne?","en":"I like singing, dancing, and also swimming. You?","th":"ฉันชอบร้องเพลง เต้นรำ และยังชอบว่ายน้ำด้วย แล้วคุณล่ะ?"},{"speaker":"A","zh":"我比较喜欢打球和爬山。","py":"Wǒ bǐjiào xǐhuan dǎ qiú hé pá shān.","en":"I relatively like playing ball and mountain climbing.","th":"ฉันค่อนข้างชอบเล่นบอลและปีนเขา"}],"grammar":[{"rule":"喜欢+V/N","zh":"喜欢 + V/N","en":"To like (doing) something","example":"我喜欢唱歌。= I like singing.","th":"喜欢 + กริยา/คำนาม = ชอบ..."},{"rule":"比较+Adj","zh":"比较 + Adj","en":"Relatively/comparatively","example":"比较贵 = relatively expensive","th":"比较 + คุณศัพท์ = ค่อนข้าง..."},{"rule":"还","zh":"还 + V","en":"Still; also in addition","example":"还喜欢游泳 = also like swimming","th":"还 + กริยา = ยัง...ด้วย"}],"key_sentences":["你的爱好是什么？= งานอดิเรกคืออะไร?","喜欢 + กริยา = ชอบ...","比较 = ค่อนข้าง"],"vocab":[{"zh":"爱好","py":"àihào","type":"名/动","en":"hobby","th":"งานอดิเรก"},{"zh":"喜欢","py":"xǐhuan","type":"动","en":"to like","th":"ชอบ"},{"zh":"唱歌","py":"chàng gē","type":"动","en":"to sing","th":"ร้องเพลง"},{"zh":"跳舞","py":"tiào wǔ","type":"动","en":"to dance","th":"เต้นรำ"},{"zh":"游泳","py":"yóuyǒng","type":"动","en":"to swim","th":"ว่ายน้ำ"},{"zh":"打球","py":"dǎ qiú","type":"动","en":"to play ball","th":"เล่นบอล"},{"zh":"爬山","py":"pá shān","type":"动","en":"to climb mountains","th":"ปีนเขา"},{"zh":"看书","py":"kàn shū","type":"动","en":"to read","th":"อ่านหนังสือ"},{"zh":"听音乐","py":"tīng yīnyuè","type":"动","en":"to listen to music","th":"ฟังเพลง"},{"zh":"比较","py":"bǐjiào","type":"副/动","en":"relatively; to compare","th":"ค่อนข้าง"},{"zh":"还","py":"hái","type":"副","en":"still; also","th":"ยัง; ด้วย"},{"zh":"当然","py":"dāngrán","type":"副","en":"of course","th":"แน่นอน"}],"exercises":[{"type":"fill","q":"我___唱歌。(ชอบ)","a":"喜欢"},{"type":"translate","q":"What is your hobby? (จีน)","a":"你的爱好是什么？"},{"type":"build","q":"สร้าง: ค่อนข้างชอบอ่านหนังสือ","a":"比较喜欢看书"}]},"13":{"title":"你买什么","title_en":"What are you buying","dialogue":[{"speaker":"A","zh":"你买什么？","py":"Nǐ mǎi shénme?","en":"What are you buying?","th":"คุณกำลังซื้ออะไร?"},{"speaker":"B","zh":"我想买几本书和一把铅笔。","py":"Wǒ xiǎng mǎi jǐ běn shū hé yī bǎ qiānbǐ.","en":"I want to buy a few books and a pencil.","th":"ฉันอยากซื้อหนังสือสองสามเล่มและดินสอ"},{"speaker":"A","zh":"这家书店卖不卖词典？","py":"Zhè jiā shūdiàn mài bu mài cídiǎn?","en":"Does this bookstore sell dictionaries?","th":"ร้านหนังสือนี้ขายพจนานุกรมไหม?"},{"speaker":"B","zh":"卖，有很多种。","py":"Mài, yǒu hěn duō zhǒng.","en":"Yes, there are many kinds.","th":"ขาย มีหลายชนิด"}],"grammar":[{"rule":"想+V","zh":"想 + V","en":"Want to do something","example":"我想买书。= I want to buy books.","th":"想 + กริยา = อยากจะ..."},{"rule":"量词","zh":"本/把/张/只/片","en":"Specific measure words","example":"一本书 (book), 一把笔 (pen), 一张纸 (paper)","th":"ลักษณนามเฉพาะ: เล่ม/ด้าม/แผ่น/ตัว"},{"rule":"卖不卖","zh":"V + 不 + V","en":"Alternative question with verb","example":"卖不卖？= Do you sell or not?","th":"กริยา + 不 + กริยา = ...หรือเปล่า?"}],"key_sentences":["想 + กริยา = อยากจะ...","量词: 本(เล่ม)/把(ด้าม)/张(แผ่น)","卖不卖？= ขายไหม?"],"vocab":[{"zh":"买","py":"mǎi","type":"动","en":"to buy","th":"ซื้อ"},{"zh":"卖","py":"mài","type":"动","en":"to sell","th":"ขาย"},{"zh":"本","py":"běn","type":"量","en":"(for books)","th":"เล่ม"},{"zh":"把","py":"bǎ","type":"量","en":"(for handled items)","th":"ด้าม"},{"zh":"笔","py":"bǐ","type":"名","en":"pen; pencil","th":"ปากกา; ดินสอ"},{"zh":"铅笔","py":"qiānbǐ","type":"名","en":"pencil","th":"ดินสอ"},{"zh":"词典","py":"cídiǎn","type":"名","en":"dictionary","th":"พจนานุกรม"},{"zh":"地图","py":"dìtú","type":"名","en":"map","th":"แผนที่"},{"zh":"纸","py":"zhǐ","type":"名","en":"paper","th":"กระดาษ"},{"zh":"张","py":"zhāng","type":"量","en":"(for flat items)","th":"แผ่น"},{"zh":"只","py":"zhī","type":"量","en":"(for small animals)","th":"ตัว (สัตว์เล็ก)"}],"exercises":[{"type":"fill","q":"我___买一本书。(อยาก)","a":"想"},{"type":"match","q":"一___书","a":"本"},{"type":"translate","q":"Do you sell dictionaries? (จีน)","a":"你们卖词典吗？"}]},"14":{"title":"你的车是新的还是旧的","title_en":"Is your bike new or old","dialogue":[{"speaker":"A","zh":"你的自行车是新的还是旧的？","py":"Nǐ de zìxíngchē shì xīn de háishi jiù de?","en":"Is your bicycle new or old?","th":"จักรยานของคุณใหม่หรือเก่า?"},{"speaker":"B","zh":"是旧的，但还能骑。","py":"Shì jiù de, dàn hái néng qí.","en":"It's old, but can still be ridden.","th":"เก่า แต่ยังปั่นได้"},{"speaker":"A","zh":"这辆比那辆快。","py":"Zhè liàng bǐ nà liàng kuài.","en":"This one is faster than that one.","th":"อันนี้เร็วกว่าอันนั้น"}],"grammar":[{"rule":"的字结构","zh":"Adj + 的 (as noun)","en":"的 creates noun from adjective","example":"新的 = the new one; 红的 = the red one","th":"形 + 的 = ใช้แทนคำนาม"},{"rule":"比较句","zh":"A + 比 + B + Adj","en":"Comparison: A is more...than B","example":"这辆比那辆快。= This is faster than that.","th":"A + 比 + B + คุณศัพท์ = A ...กว่า B"},{"rule":"还是选择","zh":"A + 还是 + B?","en":"Is it A or B?","example":"新的还是旧的？= new or old?","th":"A + 还是 + B? = A หรือ B?"}],"key_sentences":["新的/旧的 = ใหม่/เก่า (的 แทนคำนาม)","A 比 B + Adj = A ...กว่า B","还是 = หรือ (ในคำถาม)"],"vocab":[{"zh":"车","py":"chē","type":"名","en":"vehicle","th":"รถ"},{"zh":"新","py":"xīn","type":"形","en":"new","th":"ใหม่"},{"zh":"旧","py":"jiù","type":"形","en":"old","th":"เก่า"},{"zh":"自行车","py":"zìxíngchē","type":"名","en":"bicycle","th":"จักรยาน"},{"zh":"司机","py":"sījī","type":"名","en":"driver","th":"คนขับ"},{"zh":"医院","py":"yīyuàn","type":"名","en":"hospital","th":"โรงพยาบาล"},{"zh":"啊","py":"à","type":"叹","en":"oh!","th":"โอ้! (อุทาน)"},{"zh":"比","py":"bǐ","type":"介","en":"than","th":"กว่า"},{"zh":"快","py":"kuài","type":"形","en":"fast","th":"เร็ว"},{"zh":"慢","py":"màn","type":"形","en":"slow","th":"ช้า"}],"exercises":[{"type":"build","q":"สร้าง: อันนี้แพงกว่าอันนั้น","a":"这个比那个贵。"},{"type":"fill","q":"你的车是新___还是旧___？","a":"的, 的"},{"type":"translate","q":"A is faster than B. (จีน)","a":"A比B快。"}]},"15":{"title":"你家有几口人","title_en":"How many people are in your family","dialogue":[{"speaker":"A","zh":"你们公司有多少员工？","py":"Nǐmen gōngsī yǒu duōshao yuángōng?","en":"How many employees does your company have?","th":"บริษัทของคุณมีพนักงานกี่คน?"},{"speaker":"B","zh":"有一百多个员工，不都是中国员工。","py":"Yǒu yībǎi duō gè yuángōng, bù dōu shì Zhōngguó yuángōng.","en":"Over 100 employees, not all are Chinese.","th":"มีกว่าร้อยคน ไม่ได้เป็นพนักงานจีนทั้งหมด"},{"speaker":"A","zh":"你只有两个弟弟吗？","py":"Nǐ zhǐ yǒu liǎng gè dìdi ma?","en":"Do you only have two younger brothers?","th":"คุณมีน้องชายแค่สองคนเหรอ?"},{"speaker":"B","zh":"对，我只有两个弟弟。","py":"Duì, wǒ zhǐ yǒu liǎng gè dìdi.","en":"Yes, I only have two younger brothers.","th":"ใช่ ฉันมีน้องชายแค่สองคน"}],"grammar":[{"rule":"多+数词","zh":"数 + 多 + 量","en":"More than (approximate)","example":"一百多个 = more than 100","th":"ตัวเลข + 多 = กว่า..."},{"rule":"不都/都不","zh":"不都 ≠ 都不","en":"Not all vs none","example":"不都是中国人 = not all Chinese (some are); 都不是中国人 = none are Chinese","th":"不都 = ไม่ใช่ทั้งหมด vs 都不 = ไม่มีเลย"},{"rule":"只","zh":"只 + 有/做","en":"Only; just","example":"我只有两个弟弟。= I only have 2 brothers.","th":"只 = เพียงแค่"}],"key_sentences":["多少员工？= มีพนักงานกี่คน?","一百多个 = กว่าร้อยคน","不都 vs 都不"],"vocab":[{"zh":"医生","py":"yīshēng","type":"名","en":"doctor","th":"แพทย์"},{"zh":"员工","py":"yuángōng","type":"名","en":"employee","th":"พนักงาน"},{"zh":"只","py":"zhǐ","type":"副","en":"only","th":"เพียงแค่"},{"zh":"看","py":"kàn","type":"动","en":"to look; to read","th":"ดู; อ่าน"},{"zh":"做","py":"zuò","type":"动","en":"to do; to make","th":"ทำ"}],"exercises":[{"type":"translate","q":"Not all are Chinese. (จีน)","a":"不都是中国人。"},{"type":"fill","q":"我___有一个姐姐。(เพียง)","a":"只"},{"type":"choose","q":"一百___个 (กว่า)","options":["多","少","几"],"a":"多"}]}}},"hanyu_1b":{"name":"汉语教程 第一册下","name_en":"Hanyu Jiaocheng Book 1B","name_th":"ฮั่นอวี่เจี้ยวเฉิง เล่ม 1B","color":"#2980b9","lessons":{"16":{"title":"你常去图书馆吗","title_en":"Do you often go to the library","vocab":[{"zh":"现在","py":"xiànzài","type":"名","en":"now; at present","th":"ตอนนี้"},{"zh":"跟","py":"gēn","type":"介、动","en":"with; to follow","th":"กับ; ตาม"},{"zh":"一起","py":"yīqǐ","type":"副","en":"together","th":"ด้วยกัน"},{"zh":"咱们","py":"zánmen","type":"代","en":"we; us (inclusive)","th":"พวกเรา (รวมผู้ฟัง)"},{"zh":"走","py":"zǒu","type":"动","en":"to walk; to go","th":"เดิน; ไป"},{"zh":"常","py":"cháng","type":"副","en":"often; frequently","th":"บ่อย"},{"zh":"借","py":"jiè","type":"动","en":"to borrow; to lend","th":"ยืม"},{"zh":"有时候","py":"yǒu shíhou","type":"","en":"sometimes; now and then","th":"บางครั้ง"},{"zh":"时候","py":"shíhou","type":"名","en":"time; moment","th":"เวลา"},{"zh":"上网","py":"shàng wǎng","type":"动","en":"to surf the Internet","th":"ท่องอินเทอร์เน็ต"},{"zh":"网","py":"wǎng","type":"名","en":"net; network","th":"เน็ต; อินเทอร์เน็ต"},{"zh":"查","py":"chá","type":"动","en":"to consult; to look up","th":"ค้นหา; ตรวจสอบ"},{"zh":"资料","py":"zīliào","type":"名","en":"material; data; reference","th":"ข้อมูล; เอกสาร"},{"zh":"总","py":"zǒng","type":"副","en":"always","th":"เสมอ"},{"zh":"宿舍","py":"sùshè","type":"名","en":"dormitory","th":"หอพัก"},{"zh":"安静","py":"ānjìng","type":"形","en":"quiet; peaceful","th":"เงียบ; สงบ"},{"zh":"晚上","py":"wǎnshang","type":"名","en":"evening; night","th":"ตอนเย็น; กลางคืน"},{"zh":"复习","py":"fùxí","type":"动","en":"to review; to revise","th":"ทบทวน"},{"zh":"课文","py":"kèwén","type":"名","en":"text (of a lesson)","th":"บทเรียน"},{"zh":"预习","py":"yùxí","type":"动","en":"to preview; to prepare a lesson","th":"เตรียมบทเรียนล่วงหน้า"},{"zh":"生词","py":"shēngcí","type":"名","en":"new word; vocabulary","th":"คำศัพท์ใหม่"},{"zh":"或者","py":"huòzhě","type":"连","en":"or (in statements)","th":"หรือ (ในประโยคบอกเล่า)"},{"zh":"练习","py":"liànxí","type":"名、动","en":"exercise; to practice","th":"แบบฝึกหัด; ฝึกซ้อม"}],"dialogue":[{"sp":"玛丽","zh":"我现在去图书馆，你跟我一起去，好吗？","py":"Wǒ xiànzài qù túshūguǎn, nǐ gēn wǒ yīqǐ qù, hǎo ma?","th":"ฉันจะไปห้องสมุดตอนนี้ คุณไปด้วยกันไหม?"},{"sp":"麦克","zh":"好，咱们走吧。……你常去图书馆吗？","py":"Hǎo, zánmen zǒu ba. …… Nǐ cháng qù túshūguǎn ma?","th":"โอเค เราไปเลย ...คุณไปห้องสมุดบ่อยไหม?"},{"sp":"玛丽","zh":"常去。我常借书，也常在那儿看书。你呢？常去吗？","py":"Cháng qù. Wǒ cháng jiè shū, yě cháng zài nàr kàn shū. Nǐ ne? Cháng qù ma?","th":"ไปบ่อย ฉันชอบยืมหนังสือและอ่านที่นั่น แล้วคุณล่ะ?"},{"sp":"麦克","zh":"我也常去。有时候借书，有时候上网查资料，但不常在那儿看书。我总在宿舍看书。","py":"Wǒ yě cháng qù. Yǒu shíhou jiè shū, yǒu shíhou shàng wǎng chá zīliào, dàn bù cháng zài nàr kàn shū. Wǒ zǒng zài sùshè kàn shū.","th":"ฉันก็ไปบ่อย บางทียืมหนังสือ บางทีขึ้นเน็ตค้นข้อมูล แต่ไม่ค่อยอ่านที่นั่น ฉันมักอ่านในหอพัก"},{"sp":"玛丽","zh":"你的宿舍安静吗？","py":"Nǐ de sùshè ānjìng ma?","th":"หอพักคุณเงียบไหม?"},{"sp":"麦克","zh":"很安静。","py":"Hěn ānjìng.","th":"เงียบมาก"},{"sp":"A","zh":"晚上你常做什么？","py":"Wǎnshang nǐ cháng zuò shénme?","th":"ตอนเย็นคุณมักทำอะไร?"},{"sp":"B","zh":"复习课文，预习生词，或者做练习。有时候上网跟朋友聊天儿，有时候发微信或者收发邮件。","py":"Fùxí kèwén, yùxí shēngcí, huòzhě zuò liànxí. Yǒu shíhou shàng wǎng gēn péngyou liáo tiānr.","th":"ทบทวนบทเรียน อ่านล่วงหน้า หรือทำแบบฝึกหัด บางทีคุยกับเพื่อนออนไลน์"}],"grammar":[{"rule":"时间词作状语","zh":"Time word + V / S + Time + V","en":"Temporal words as adverbials (placed before verb or subject)","example":"晚上你做什么？我晚上复习课文。","th":"คำบอกเวลาวางหน้ากริยาหรือประธาน"},{"rule":"还是 vs 或者","zh":"还是 (questions) vs 或者 (statements)","en":"还是 for alternative questions; 或者 for declarative sentences","example":"你喝茶还是咖啡？(Q) / 我喝茶或者咖啡。(S)","th":"还是 ใช้ในคำถาม, 或者 ใช้ในประโยคบอกเล่า"},{"rule":"吧 particle","zh":"S + V + 吧","en":"Modal particle 吧 for suggestion or agreement","example":"咱们走吧。= Let's go. / 好吧。= OK.","th":"吧 แสดงข้อเสนอหรือความเห็นด้วย"}]},"17":{"title":"他在做什么呢","title_en":"What is he doing","vocab":[{"zh":"在","py":"zài","type":"副、动","en":"in progress; at; in","th":"กำลัง; อยู่ที่"},{"zh":"正在","py":"zhèngzài","type":"副","en":"in the process of; right now","th":"กำลัง (ตอนนี้)"},{"zh":"呢","py":"ne","type":"助","en":"particle (for ongoing action)","th":"อนุภาค (แสดงการกระทำต่อเนื่อง)"},{"zh":"电视","py":"diànshì","type":"名","en":"television; TV","th":"โทรทัศน์; ทีวี"},{"zh":"骑","py":"qí","type":"动","en":"to ride (a bike/horse)","th":"ขี่"},{"zh":"怎么","py":"zěnme","type":"代","en":"how; why","th":"อย่างไร; ทำไม"},{"zh":"教","py":"jiāo","type":"动","en":"to teach","th":"สอน"},{"zh":"让","py":"ràng","type":"动、介","en":"to let; to allow; to make","th":"ให้; อนุญาต"},{"zh":"写","py":"xiě","type":"动","en":"to write","th":"เขียน"},{"zh":"谁","py":"shéi","type":"代","en":"who; whom","th":"ใคร"},{"zh":"同","py":"tóng","type":"形、介","en":"same; together with","th":"เดียวกัน; ร่วมกับ"},{"zh":"打电话","py":"dǎ diànhuà","type":"动","en":"to make a phone call","th":"โทรศัพท์"},{"zh":"电话","py":"diànhuà","type":"名","en":"telephone; phone call","th":"โทรศัพท์"},{"zh":"作业","py":"zuòyè","type":"名","en":"homework; assignment","th":"การบ้าน"}],"dialogue":[{"sp":"玛丽","zh":"麦克在宿舍吗？","py":"Màikè zài sùshè ma?","th":"แมคอยู่ในหอพักไหม?"},{"sp":"爱德华","zh":"在。","py":"Zài.","th":"อยู่"},{"sp":"玛丽","zh":"他在做什么呢？","py":"Tā zài zuò shénme ne?","th":"เขากำลังทำอะไรอยู่?"},{"sp":"爱德华","zh":"我出来的时候，他正在听音乐呢。","py":"Wǒ chūlai de shíhou, tā zhèngzài tīng yīnyuè ne.","th":"ตอนที่ฉันออกมา เขากำลังฟังเพลงอยู่"},{"sp":"玛丽","zh":"你是不是在听音乐呢？","py":"Nǐ shì bu shì zài tīng yīnyuè ne?","th":"คุณกำลังฟังเพลงอยู่ใช่ไหม?"},{"sp":"麦克","zh":"没有，我正听课文录音呢。","py":"Méiyǒu, wǒ zhèng tīng kèwén lùyīn ne.","th":"ไม่ใช่ ฉันกำลังฟังเสียงบทเรียนอยู่"}],"grammar":[{"rule":"在/正在/正+V+呢","zh":"在/正在/正 + V (+ 呢)","en":"Expressing ongoing action (progressive aspect)","example":"他正在听音乐呢。= He is listening to music.","th":"在/正在/正 + กริยา = กำลัง... (Continuous tense)"},{"rule":"双宾语句","zh":"S + V + IO + DO","en":"Sentences with two objects (indirect + direct object)","example":"老师教我们语法。= The teacher teaches us grammar.","th":"ประโยคสองกรรม: กริยา + กรรมทางอ้อม + กรรมตรง"},{"rule":"怎么+V","zh":"怎么 + V","en":"Asking how an action is done","example":"你怎么去？= How are you going?","th":"怎么 + กริยา = ...อย่างไร?"}]},"18":{"title":"我去超市买东西","title_en":"I'm going to the supermarket to do some shopping","vocab":[{"zh":"超市","py":"chāoshì","type":"名","en":"supermarket","th":"ซูเปอร์มาร์เก็ต"},{"zh":"东西","py":"dōngxi","type":"名","en":"thing; stuff","th":"ของ; สิ่งของ"},{"zh":"顺便","py":"shùnbiàn","type":"副","en":"conveniently; while you're at it","th":"สะดวก; แวะ"},{"zh":"替","py":"tì","type":"介","en":"for; on behalf of","th":"แทน; เพื่อ"},{"zh":"问题","py":"wèntí","type":"名","en":"question; problem","th":"คำถาม; ปัญหา"},{"zh":"代表团","py":"dàibiǎotuán","type":"名","en":"delegation","th":"คณะผู้แทน"},{"zh":"参观","py":"cānguān","type":"动","en":"to visit; to tour","th":"เยี่ยมชม"},{"zh":"外贸","py":"wàimào","type":"名","en":"foreign trade","th":"การค้าต่างประเทศ"},{"zh":"上海","py":"Shànghǎi","type":"名","en":"Shanghai","th":"เซี่ยงไฮ้"},{"zh":"帮","py":"bāng","type":"动","en":"to help; to assist","th":"ช่วย"},{"zh":"水果","py":"shuǐguǒ","type":"名","en":"fruit","th":"ผลไม้"},{"zh":"蔬菜","py":"shūcài","type":"名","en":"vegetables","th":"ผัก"},{"zh":"需要","py":"xūyào","type":"动","en":"to need; to require","th":"ต้องการ; จำเป็น"}],"dialogue":[{"sp":"麦克","zh":"玛丽，你去哪儿？","py":"Màikè: Mǎlì, nǐ qù nǎr?","th":"แมรี่ คุณจะไปไหน?"},{"sp":"玛丽","zh":"我去超市买东西。你有什么事儿吗？","py":"Wǒ qù chāoshì mǎi dōngxi. Nǐ yǒu shénme shìr ma?","th":"ฉันไปซุปเปอร์มาร์เก็ตซื้อของ คุณมีธุระอะไรไหม?"},{"sp":"麦克","zh":"你顺便替我买一盒曲别针和一本《读者》吧。","py":"Nǐ shùnbiàn tì wǒ mǎi yī hé qūbiézhēn hé yī běn Dúzhě ba.","th":"ช่วยซื้อลวดเสียบกระดาษหนึ่งกล่องและนิตยสาร Duzhe หนึ่งเล่มให้ฉันด้วย"},{"sp":"玛丽","zh":"没问题。你还需要别的吗？","py":"Méi wèntí. Nǐ hái xūyào bié de ma?","th":"ไม่มีปัญหา ต้องการอะไรอีกไหม?"},{"sp":"麦克","zh":"不用了，谢谢。","py":"Bú yòng le, xièxie.","th":"ไม่ต้องแล้ว ขอบคุณ"}],"grammar":[{"rule":"连动句","zh":"S + V₁ + V₂","en":"Sentences with serial verb construction","example":"我去超市买东西。= I go to the supermarket to buy things.","th":"ประโยคกริยาต่อเนื่อง: ไป + ทำ..."},{"rule":"顺便","zh":"顺便 + V","en":"To do something conveniently while doing something else","example":"你顺便替我买一下。= Buy it for me while you're at it.","th":"顺便 = แวะ/สะดวก + กริยา"}]},"19":{"title":"可以试试吗","title_en":"May I try it on","vocab":[{"zh":"可以","py":"kěyǐ","type":"助动","en":"can; may; possible","th":"สามารถ; ได้"},{"zh":"试","py":"shì","type":"动","en":"to try; to test","th":"ลอง"},{"zh":"又","py":"yòu","type":"副","en":"again; also; and","th":"อีกครั้ง; และ"},{"zh":"漂亮","py":"piàoliang","type":"形","en":"beautiful; pretty","th":"สวย; หล่อ"},{"zh":"一点儿","py":"yīdiǎnr","type":"","en":"a little bit","th":"นิดหน่อย"},{"zh":"人民币","py":"rénmínbì","type":"名","en":"RMB; Chinese currency","th":"เงินหยวน"},{"zh":"商店","py":"shāngdiàn","type":"名","en":"shop; store","th":"ร้านค้า"},{"zh":"打折","py":"dǎ zhé","type":"动","en":"to give a discount","th":"ลดราคา"},{"zh":"换","py":"huàn","type":"动","en":"to exchange; to change","th":"แลก; เปลี่ยน"},{"zh":"合适","py":"héshì","type":"形","en":"suitable; appropriate; fit","th":"เหมาะสม; พอดี"},{"zh":"大小","py":"dàxiǎo","type":"名","en":"size","th":"ขนาด"},{"zh":"款式","py":"kuǎnshì","type":"名","en":"style; fashion; design","th":"สไตล์; รูปแบบ"}],"dialogue":[{"sp":"玛丽","zh":"这件毛衣可以试试吗？","py":"Zhè jiàn máoyī kěyǐ shì shi ma?","th":"เสื้อสเวตเตอร์ตัวนี้ลองสวมได้ไหม?"},{"sp":"售货员","zh":"当然可以。这件很漂亮，又大方又好看。","py":"Dāngrán kěyǐ. Zhè jiàn hěn piàoliang, yòu dàfang yòu hǎokàn.","th":"แน่นอนได้ ตัวนี้สวยมาก ดูสุภาพและสวยงาม"},{"sp":"玛丽","zh":"多少钱？","py":"Duōshao qián?","th":"ราคาเท่าไหร่?"},{"sp":"售货员","zh":"三百五十块。","py":"Sānbǎi wǔshí kuài.","th":"สามร้อยห้าสิบหยวน"},{"sp":"玛丽","zh":"太贵了，便宜一点儿吧。","py":"Tài guì le, piányī yīdiǎnr ba.","th":"แพงไปหน่อย ลดหน่อยได้ไหม"},{"sp":"售货员","zh":"那就三百块吧，这是最低价了。","py":"Nà jiù sānbǎi kuài ba, zhè shì zuì dī jià le.","th":"งั้นสามร้อยหยวนนะ นี่เป็นราคาต่ำสุดแล้ว"}],"grammar":[{"rule":"可以+V","zh":"可以 + V","en":"Can/may do something (permission or possibility)","example":"可以试试吗？= May I try it on?","th":"可以 + กริยา = สามารถ/ได้"},{"rule":"又...又...","zh":"又 + Adj/V + 又 + Adj/V","en":"Both...and... (two qualities simultaneously)","example":"又大方又好看 = both elegant and good-looking","th":"又...又... = ทั้ง...และ..."},{"rule":"一点儿 usage","zh":"Adj + 一点儿 (after adj)","en":"A little bit (placed after adjective)","example":"便宜一点儿 = a little cheaper","th":"คุณศัพท์ + 一点儿 = ...หน่อย"}]},"20":{"title":"祝你生日快乐","title_en":"Happy birthday to you","vocab":[{"zh":"祝","py":"zhù","type":"动","en":"to wish; to express good wishes","th":"อวยพร"},{"zh":"生日","py":"shēngrì","type":"名","en":"birthday","th":"วันเกิด"},{"zh":"快乐","py":"kuàilè","type":"形","en":"happy; joyful","th":"มีความสุข"},{"zh":"年","py":"nián","type":"名、量","en":"year","th":"ปี"},{"zh":"月","py":"yuè","type":"名、量","en":"month; moon","th":"เดือน"},{"zh":"号","py":"hào","type":"名、量","en":"date; number","th":"วันที่; หมายเลข"},{"zh":"大学","py":"dàxué","type":"名","en":"university; college","th":"มหาวิทยาลัย"},{"zh":"毕业","py":"bì yè","type":"动","en":"to graduate","th":"เรียนจบ"},{"zh":"属","py":"shǔ","type":"动","en":"to belong to; zodiac sign year","th":"เกิดปี (ราศีจีน)"},{"zh":"岁","py":"suì","type":"量","en":"year of age","th":"ขวบ; ปี (อายุ)"},{"zh":"同岁","py":"tóng suì","type":"","en":"same age","th":"อายุเท่ากัน"},{"zh":"送","py":"sòng","type":"动","en":"to give (as a gift); to send","th":"ให้ (ของขวัญ); ส่ง"},{"zh":"礼物","py":"lǐwù","type":"名","en":"gift; present","th":"ของขวัญ"},{"zh":"蛋糕","py":"dàngāo","type":"名","en":"cake","th":"เค้ก"}],"dialogue":[{"sp":"A","zh":"你哪一年大学毕业？","py":"Nǐ nǎ yī nián dàxué bìyè?","th":"คุณเรียนจบมหาวิทยาลัยปีไหน?"},{"sp":"B","zh":"二〇一五年。你呢？","py":"Èr líng yī wǔ nián. Nǐ ne?","th":"ปี 2015 แล้วคุณล่ะ?"},{"sp":"A","zh":"我是二〇一六年毕业的。你是几月几号生日？","py":"Wǒ shì èr líng yī liù nián bìyè de. Nǐ shì jǐ yuè jǐ hào shēngrì?","th":"ฉันจบปี 2016 คุณเกิดวันที่เท่าไหร่เดือนอะไร?"},{"sp":"B","zh":"三月二十号。祝你生日快乐！","py":"Sān yuè èrshí hào. Zhù nǐ shēngrì kuàilè!","th":"20 มีนาคม อวยพรวันเกิดให้คุณด้วย!"},{"sp":"A","zh":"谢谢你！你属什么？","py":"Xièxie nǐ! Nǐ shǔ shénme?","th":"ขอบคุณ! คุณเกิดปีอะไร?"},{"sp":"B","zh":"我属狗，今年三十岁了。","py":"Wǒ shǔ gǒu, jīnnián sānshí suì le.","th":"ฉันเกิดปีหมา ปีนี้อายุสามสิบแล้ว"}],"grammar":[{"rule":"名词谓语句","zh":"S + 年/月/号 (no 是)","en":"Nominal predicate for dates (no 是 needed)","example":"今天三月二十号。= Today is March 20th.","th":"ประโยคคำนามเป็นภาคแสดง ไม่ต้องใช้ 是 สำหรับวันที่"},{"rule":"年月日表达","zh":"年/月/号/星期 (big→small)","en":"Date expression order: year → month → day → weekday","example":"二〇二五年三月二十号，星期四","th":"บอกวันที่: ปี → เดือน → วัน → วันในสัปดาห์"},{"rule":"疑问语调","zh":"Rising intonation for 吗 questions","en":"Interrogative intonation (6) — rising tone","example":"你是几月几号生日？","th":"การใช้เสียงสูงขึ้นในคำถาม"}]},"21":{"title":"我们明天七点一刻出发","title_en":"Tomorrow we'll depart at a quarter past seven","vocab":[{"zh":"点","py":"diǎn","type":"量","en":"o'clock; dot; point","th":"โมง"},{"zh":"分","py":"fēn","type":"量","en":"minute; fen","th":"นาที"},{"zh":"刻","py":"kè","type":"量","en":"quarter (of an hour)","th":"สิบห้านาที; ควอเตอร์"},{"zh":"半","py":"bàn","type":"数","en":"half","th":"ครึ่ง"},{"zh":"早上","py":"zǎoshang","type":"名","en":"morning","th":"ตอนเช้า"},{"zh":"上午","py":"shàngwǔ","type":"名","en":"morning (before noon)","th":"ช่วงเช้า"},{"zh":"下午","py":"xiàwǔ","type":"名","en":"afternoon","th":"ช่วงบ่าย"},{"zh":"出发","py":"chūfā","type":"动","en":"to set out; to depart","th":"ออกเดินทาง"},{"zh":"起床","py":"qǐ chuáng","type":"动","en":"to get up; to get out of bed","th":"ตื่นนอน"},{"zh":"吃饭","py":"chī fàn","type":"动","en":"to eat (a meal)","th":"กินข้าว"},{"zh":"上课","py":"shàng kè","type":"动","en":"to go to class; to attend class","th":"เข้าเรียน"},{"zh":"下课","py":"xià kè","type":"动","en":"class is over; to finish class","th":"เลิกเรียน"},{"zh":"睡觉","py":"shuì jiào","type":"动","en":"to sleep; to go to bed","th":"นอนหลับ"},{"zh":"差","py":"chà","type":"动","en":"to lack; to be short of","th":"ขาด; อีก (เวลา)"},{"zh":"聊天儿","py":"liáo tiānr","type":"动","en":"to chat; to have a talk","th":"คุย; สนทนา"}],"dialogue":[{"sp":"A","zh":"我的一天：我每天六点半起床，七点吃早饭。上午八点上课，十二点下课。","py":"Wǒ de yītiān: Wǒ měi tiān liù diǎn bàn qǐchuáng, qī diǎn chī zǎofàn.","th":"หนึ่งวันของฉัน: ฉันตื่นทุกวันหกโมงครึ่ง เจ็ดโมงกินข้าวเช้า เรียนแปดโมงเช้า เลิกเรียนเที่ยง"},{"sp":"B","zh":"明天早上七点一刻出发，同学们，大家准备好了吗？","py":"Míngtiān zǎoshang qī diǎn yī kè chūfā, tóngxuémen, dàjiā zhǔnbèi hǎo le ma?","th":"พรุ่งนี้เช้าเจ็ดโมงสิบห้านาทีออกเดินทาง เพื่อนๆ ทุกคนเตรียมพร้อมแล้วหรือยัง?"},{"sp":"A","zh":"我常常去朋友那儿聊天儿。","py":"Wǒ cháng cháng qù péngyou nàr liáo tiānr.","th":"ฉันมักไปคุยกับเพื่อน"}],"grammar":[{"rule":"时间的表达","zh":"点/刻/半/差 for time","en":"Expressing time: o'clock/quarter/half/to","example":"七点一刻=7:15 / 七点半=7:30 / 差五分八点=7:55","th":"การบอกเวลา: 点(โมง) 刻(สิบห้า) 半(ครึ่ง) 差(อีก)"},{"rule":"每天+时间+V","zh":"每天 + time + V","en":"Daily routine expressions","example":"我每天七点起床。= I get up at 7 every day.","th":"ทุกวัน + เวลา + กริยา"}]},"22":{"title":"我打算请老师教我京剧","title_en":"I'm planning to find a teacher to teach me Peking opera","vocab":[{"zh":"打算","py":"dǎsuàn","type":"动、名","en":"to plan; plan; intention","th":"วางแผน; แผน"},{"zh":"请","py":"qǐng","type":"动","en":"to invite; please","th":"เชิญ; กรุณา"},{"zh":"京剧","py":"jīngjù","type":"名","en":"Peking opera","th":"งิ้วปักกิ่ง"},{"zh":"以前","py":"yǐqián","type":"名","en":"before; previously; in the past","th":"ก่อน; ก่อนหน้านี้"},{"zh":"以后","py":"yǐhòu","type":"名","en":"after; afterwards; in the future","th":"หลังจาก; ต่อไป"},{"zh":"书法","py":"shūfǎ","type":"名","en":"calligraphy","th":"การเขียนพู่กัน; คัดลายมือ"},{"zh":"感兴趣","py":"gǎn xìngqù","type":"","en":"to be interested in","th":"สนใจ"},{"zh":"兴趣","py":"xìngqù","type":"名","en":"interest; hobby","th":"ความสนใจ"},{"zh":"太极拳","py":"tàijíquán","type":"名","en":"tai chi","th":"ไทเก็ก"},{"zh":"武术","py":"wǔshù","type":"名","en":"martial arts","th":"ศิลปะการต่อสู้"},{"zh":"画","py":"huà","type":"动、名","en":"to draw/paint; painting","th":"วาด; ภาพ"},{"zh":"国画","py":"guóhuà","type":"名","en":"traditional Chinese painting","th":"จิตรกรรมจีนแบบดั้งเดิม"}],"dialogue":[{"sp":"A","zh":"你打算请老师教你什么？","py":"Nǐ dǎsuàn qǐng lǎoshī jiāo nǐ shénme?","th":"คุณวางแผนจะให้ครูสอนอะไร?"},{"sp":"B","zh":"我打算请老师教我京剧。我来中国以前就对书法特别感兴趣。","py":"Wǒ dǎsuàn qǐng lǎoshī jiāo wǒ jīngjù. Wǒ lái Zhōngguó yǐqián jiù duì shūfǎ tèbié gǎn xìngqù.","th":"ฉันวางแผนจะให้ครูสอนงิ้วปักกิ่ง ก่อนมาจีนฉันก็สนใจการเขียนพู่กันเป็นพิเศษอยู่แล้ว"},{"sp":"A","zh":"你是啊。你喜欢看京剧吗？","py":"Nǐ shì a. Nǐ xǐhuan kàn jīngjù ma?","th":"อย่างนั้นเหรอ คุณชอบดูงิ้วไหม?"},{"sp":"B","zh":"是啊，我对中国传统文化很感兴趣。","py":"Shì a, wǒ duì Zhōngguó chuántǒng wénhuà hěn gǎn xìngqù.","th":"ใช่ ฉันสนใจวัฒนธรรมดั้งเดิมจีนมาก"}],"grammar":[{"rule":"打算+V","zh":"打算 + V","en":"To plan to do something","example":"我打算请老师教我京剧。= I plan to ask a teacher to teach me Peking opera.","th":"打算 + กริยา = วางแผนจะ..."},{"rule":"以前/以后","zh":"以前 (before) / 以后 (after/later)","en":"以前 = before; 以后 = after, in the future","example":"来中国以前 = before coming to China; 以后我去 = I'll go later","th":"以前 = ก่อน; 以后 = หลังจาก/ต่อไป"},{"rule":"兼语句","zh":"S + V₁ + O₁(=S₂) + V₂","en":"Pivotal sentence — object of V₁ is subject of V₂","example":"我请老师教我。= I invite teacher (to) teach me.","th":"ประโยคกรรมเป็นประธาน: ฉันขอให้ครูสอนฉัน"}]},"23":{"title":"学校里边有银行吗","title_en":"Is there a bank on campus","vocab":[{"zh":"里边","py":"lǐbian","type":"名","en":"inside; interior","th":"ข้างใน"},{"zh":"旁边","py":"pángbiān","type":"名","en":"beside; next to","th":"ข้างๆ"},{"zh":"前边","py":"qiánbian","type":"名","en":"in front; ahead","th":"ข้างหน้า"},{"zh":"后边","py":"hòubian","type":"名","en":"behind; at the back","th":"ข้างหลัง"},{"zh":"左边","py":"zuǒbian","type":"名","en":"left side","th":"ด้านซ้าย"},{"zh":"右边","py":"yòubian","type":"名","en":"right side","th":"ด้านขวา"},{"zh":"离","py":"lí","type":"介","en":"from; away from","th":"ห่างจาก"},{"zh":"从","py":"cóng","type":"介","en":"from","th":"จาก"},{"zh":"往","py":"wǎng","type":"介","en":"towards; to","th":"ไปทาง"},{"zh":"多远","py":"duō yuǎn","type":"","en":"how far","th":"ไกลแค่ไหน"},{"zh":"远","py":"yuǎn","type":"形","en":"far; distant","th":"ไกล"},{"zh":"近","py":"jìn","type":"形","en":"near; close","th":"ใกล้"},{"zh":"米","py":"mǐ","type":"量","en":"meter","th":"เมตร"},{"zh":"公里","py":"gōnglǐ","type":"量","en":"kilometer","th":"กิโลเมตร"},{"zh":"博物馆","py":"bówùguǎn","type":"名","en":"museum","th":"พิพิธภัณฑ์"},{"zh":"图书馆","py":"túshūguǎn","type":"名","en":"library","th":"ห้องสมุด"}],"dialogue":[{"sp":"A","zh":"请问，学校里边有银行吗？","py":"Qǐngwèn, xuéxiào lǐbian yǒu yínháng ma?","th":"ขอถามหน่อย ในมหาวิทยาลัยมีธนาคารไหม?"},{"sp":"B","zh":"有，就在图书馆旁边。","py":"Yǒu, jiù zài túshūguǎn pángbiān.","th":"มี อยู่ข้างๆ ห้องสมุดเลย"},{"sp":"A","zh":"从这儿到博物馆有多远？","py":"Cóng zhèr dào bówùguǎn yǒu duō yuǎn?","th":"จากที่นี่ไปพิพิธภัณฑ์ไกลแค่ไหน?"},{"sp":"B","zh":"不太远，有七八百米吧。","py":"Bú tài yuǎn, yǒu qī bā bǎi mǐ ba.","th":"ไม่ไกลมาก ประมาณเจ็ดแปดร้อยเมตร"},{"sp":"A","zh":"往哪儿走？","py":"Wǎng nǎr zǒu?","th":"เดินไปทางไหน?"},{"sp":"B","zh":"往前走，到十字路口往右拐，再走五分钟就到了。","py":"Wǎng qián zǒu, dào shízì lùkǒu wǎng yòu guǎi, zài zǒu wǔ fēnzhōng jiù dào le.","th":"เดินไปข้างหน้า ถึงสี่แยกให้เลี้ยวขวา เดินอีกห้านาทีก็ถึง"}],"grammar":[{"rule":"方位词","zh":"里/旁/前/后/左/右/上/下/边","en":"Nouns of locality (position words)","example":"图书馆旁边 = next to the library; 学校里边 = inside the school","th":"คำบอกตำแหน่ง: ใน/ข้าง/หน้า/หลัง/ซ้าย/ขวา"},{"rule":"存在句","zh":"Place + 有/是 + Object","en":"Existence sentences","example":"学校里有银行。= There is a bank in the school.","th":"ประโยคแสดงการมีอยู่: ที่... + มี + สิ่งของ"},{"rule":"离/从/往","zh":"离(from-distance) / 从(from-origin) / 往(toward)","en":"Prepositions of distance/direction","example":"离这儿很近。从这儿往右走。","th":"离=ห่างจาก, 从=จาก, 往=ไปทาง"}]},"24":{"title":"我想学太极拳","title_en":"I want to learn tai chi","vocab":[{"zh":"想","py":"xiǎng","type":"助动、动","en":"to want to; to think; to miss","th":"อยาก; คิด; คิดถึง"},{"zh":"能","py":"néng","type":"助动","en":"can; to be able to","th":"สามารถ"},{"zh":"会","py":"huì","type":"助动","en":"can; to know how to","th":"สามารถ; รู้วิธี"},{"zh":"应该","py":"yīnggāi","type":"助动","en":"should; ought to","th":"ควร"},{"zh":"遍","py":"biàn","type":"量","en":"measure word for actions done from start to finish","th":"รอบ; ครั้ง (ตั้งแต่ต้นจนจบ)"},{"zh":"慢","py":"màn","type":"形","en":"slow","th":"ช้า"},{"zh":"再","py":"zài","type":"副","en":"again; once more","th":"อีกครั้ง"},{"zh":"说","py":"shuō","type":"动","en":"to speak; to say","th":"พูด"},{"zh":"从","py":"cóng","type":"介","en":"from","th":"จาก"},{"zh":"到","py":"dào","type":"介、动","en":"to; until; to arrive","th":"ถึง; ไปถึง"},{"zh":"原因","py":"yuányīn","type":"名","en":"reason; cause","th":"เหตุผล; สาเหตุ"},{"zh":"因为","py":"yīnwèi","type":"连","en":"because","th":"เพราะ"},{"zh":"所以","py":"suǒyǐ","type":"连","en":"so; therefore","th":"ดังนั้น; จึง"}],"dialogue":[{"sp":"A","zh":"您能不能再说一遍？","py":"Nín néng bu néng zài shuō yī biàn?","th":"คุณช่วยพูดอีกครั้งได้ไหม?"},{"sp":"B","zh":"当然可以。我想学太极拳。","py":"Dāngrán kěyǐ. Wǒ xiǎng xué tàijíquán.","th":"แน่นอนได้ ฉันอยากเรียนไทเก็ก"},{"sp":"A","zh":"从几点到几点上课？","py":"Cóng jǐ diǎn dào jǐ diǎn shàng kè?","th":"เรียนตั้งแต่กี่โมงถึงกี่โมง?"},{"sp":"B","zh":"从早上八点到十点。你为什么想学太极拳？","py":"Cóng zǎoshang bā diǎn dào shí diǎn. Nǐ wèishénme xiǎng xué tàijíquán?","th":"ตั้งแต่แปดโมงเช้าถึงสิบโมง คุณทำไมถึงอยากเรียนไทเก็ก?"},{"sp":"A","zh":"因为太极拳对身体很好，所以我想学。","py":"Yīnwèi tàijíquán duì shēntǐ hěn hǎo, suǒyǐ wǒ xiǎng xué.","th":"เพราะไทเก็กดีต่อสุขภาพ จึงอยากเรียน"}],"grammar":[{"rule":"能愿动词","zh":"能/会/可以/想/要/应该 + V","en":"Modal verbs (ability, permission, desire, obligation)","example":"您能不能再说一遍？能 = can/able to","th":"助动词: 能(ทำได้) 会(รู้วิธี) 可以(ได้) 想(อยาก)"},{"rule":"因为...所以...","zh":"因为 + reason + 所以 + result","en":"Because...therefore... (cause and result)","example":"因为太极拳好，所以我学。= Because t'ai chi is good, so I learn it.","th":"เพราะ...ดังนั้น... (เหตุและผล)"},{"rule":"从...到...","zh":"从 + start + 到 + end","en":"From...to... (time or place range)","example":"从八点到十点 = from 8 to 10 o'clock","th":"จาก...ถึง... (ช่วงเวลาหรือระยะทาง)"}]},"25":{"title":"她学得很好","title_en":"She learns well","vocab":[{"zh":"得","py":"de","type":"助","en":"structural particle (complement marker)","th":"อนุภาคแสดงประสิทธิภาพ"},{"zh":"起","py":"qǐ","type":"动","en":"to rise; to get up","th":"ลุก; ตื่น"},{"zh":"每天","py":"měi tiān","type":"","en":"every day; daily","th":"ทุกวัน"},{"zh":"早","py":"zǎo","type":"形、名","en":"early; morning","th":"เช้า; แต่เช้า"},{"zh":"打","py":"dǎ","type":"动","en":"to hit; to play (sports/games)","th":"ตี; เล่น (กีฬา)"},{"zh":"球","py":"qiú","type":"名","en":"ball","th":"ลูกบอล"},{"zh":"跑步","py":"pǎo bù","type":"动","en":"to run; to jog","th":"วิ่ง; จ็อกกิ้ง"},{"zh":"还可以","py":"hái kěyǐ","type":"","en":"passable; not bad; so-so","th":"พอใช้ได้; ก็โอเค"},{"zh":"努力","py":"nǔlì","type":"形、副","en":"hardworking; diligently","th":"ขยัน; อย่างตั้งใจ"},{"zh":"进步","py":"jìnbù","type":"动、名","en":"to make progress; progress","th":"ก้าวหน้า; ความก้าวหน้า"},{"zh":"继续","py":"jìxù","type":"动","en":"to continue; to go on","th":"ต่อ; ดำเนินต่อ"},{"zh":"加油","py":"jiā yóu","type":"动","en":"come on!; to cheer on; to make an effort","th":"สู้ๆ; เพิ่มความพยายาม"}],"dialogue":[{"sp":"A","zh":"她学得很好，她每天都起得很早。","py":"Tā xué de hěn hǎo, tā měi tiān dōu qǐ de hěn zǎo.","th":"เธอเรียนเก่งมาก เธอตื่นเช้าทุกวัน"},{"sp":"B","zh":"您看她太极拳打得怎么样？","py":"Nín kàn tā tàijíquán dǎ de zěnmeyàng?","th":"คุณคิดว่าเธอเล่นไทเก็กเป็นอย่างไรบ้าง?"},{"sp":"A","zh":"打得还可以，但是还需要多练习。","py":"Dǎ de hái kěyǐ, dànshì hái xūyào duō liànxí.","th":"พอใช้ได้ แต่ยังต้องฝึกเพิ่มอีก"},{"sp":"B","zh":"她每天都练习吗？","py":"Tā měi tiān dōu liànxí ma?","th":"เธอฝึกทุกวันไหม?"},{"sp":"A","zh":"对，她每天都起得很早来练习。","py":"Duì, tā měi tiān dōu qǐ de hěn zǎo lái liànxí.","th":"ใช่ เธอตื่นแต่เช้าทุกวันมาฝึก"}],"grammar":[{"rule":"状态补语(1)","zh":"V + 得 + Adj/Adv","en":"Complement of state (describing manner/degree of action)","example":"她学得很好。= She studies very well. / 起得很早 = get up very early","th":"V + 得 + คุณศัพท์ = ทำ...ได้...มาก (บอกระดับ)"},{"rule":"得 structure","zh":"V + 得 + complement","en":"得 links verb to its result/degree complement","example":"打得好 = play well; 说得很流利 = speak very fluently","th":"กริยา + 得 + ส่วนขยายระดับ"}]}}},"speaking":{"name":"汉语口语速成 入门篇","name_en":"Short-Term Spoken Chinese Threshold Vol.1","name_th":"ฮั่นอวี่โข่วอวี่ซู่เฉิง เล่มเริ่มต้น","color":"#e67e22","lessons":{"1":{"title":"你好","title_en":"HELLO","dialogue":[{"sp":"A","zh":"你好！","py":"Nǐ hǎo!","th":"สวัสดี!"},{"sp":"B","zh":"你好！","py":"Nǐ hǎo!","th":"สวัสดี!"}],"vocab":[{"zh":"你好","py":"nǐ hǎo","type":"","en":"Hello","th":"สวัสดี"},{"zh":"你","py":"nǐ","type":"代","en":"you","th":"คุณ"},{"zh":"好","py":"hǎo","type":"形","en":"good","th":"ดี"}],"grammar":[{"rule":"声调 Tones","zh":"四个声调：阴平/阳平/上声/去声","en":"4 tones: 1st (flat) / 2nd (rising) / 3rd (dipping) / 4th (falling)","example":"妈má / 麻má / 马mǎ / 骂mà","th":"4 วรรณยุกต์จีน: สูง/สูงขึ้น/ต่ำลงขึ้น/ลง"}]},"2":{"title":"你好吗","title_en":"HOW ARE YOU","dialogue":[{"sp":"A","zh":"你好吗？","py":"Nǐ hǎo ma?","th":"คุณสบายดีไหม?"},{"sp":"B","zh":"我很好，谢谢。你呢？","py":"Wǒ hěn hǎo, xièxie. Nǐ ne?","th":"ฉันสบายดี ขอบคุณ แล้วคุณล่ะ?"},{"sp":"A","zh":"我也很好。","py":"Wǒ yě hěn hǎo.","th":"ฉันก็สบายดี"}],"vocab":[{"zh":"吗","py":"ma","type":"助","en":"question particle","th":"อนุภาคคำถาม"},{"zh":"我","py":"wǒ","type":"代","en":"I, me","th":"ฉัน"},{"zh":"很","py":"hěn","type":"副","en":"very","th":"มาก"},{"zh":"谢谢","py":"xièxie","type":"动","en":"thank you","th":"ขอบคุณ"},{"zh":"呢","py":"ne","type":"助","en":"and you? (particle)","th":"แล้ว...ล่ะ?"},{"zh":"也","py":"yě","type":"副","en":"also, too","th":"ด้วย"},{"zh":"爸爸","py":"bàba","type":"名","en":"father","th":"พ่อ"},{"zh":"妈妈","py":"māma","type":"名","en":"mother","th":"แม่"},{"zh":"都","py":"dōu","type":"副","en":"all, both","th":"ทั้งหมด"},{"zh":"他们","py":"tāmen","type":"代","en":"they, them","th":"พวกเขา"},{"zh":"哥哥","py":"gēge","type":"名","en":"elder brother","th":"พี่ชาย"},{"zh":"他","py":"tā","type":"代","en":"he, him","th":"เขา"},{"zh":"姐姐","py":"jiějie","type":"名","en":"elder sister","th":"พี่สาว"},{"zh":"她","py":"tā","type":"代","en":"she, her","th":"เธอ"},{"zh":"爱人","py":"àiren","type":"名","en":"husband or wife","th":"สามี/ภรรยา"},{"zh":"弟弟","py":"dìdi","type":"名","en":"younger brother","th":"น้องชาย"}],"grammar":[{"rule":"吗-question","zh":"S + Adj/V + 吗？","en":"Yes/No question with 吗","example":"你好吗？= How are you?","th":"ประโยคถาม ใช้ 吗 ต่อท้าย"},{"rule":"呢-question","zh":"S + 呢？","en":"What about...? (follow-up)","example":"你呢？= And you?","th":"呢 ถามต่อเนื่อง"}]},"3":{"title":"你吃什么","title_en":"WHAT DO YOU WANT TO EAT","dialogue":[{"sp":"A","zh":"你吃什么？","py":"Nǐ chī shénme?","th":"คุณกินอะไร?"},{"sp":"B","zh":"我吃饺子。","py":"Wǒ chī jiǎozi.","th":"ฉันกินเกี๊ยว"},{"sp":"A","zh":"你喝什么？","py":"Nǐ hē shénme?","th":"คุณดื่มอะไร?"},{"sp":"B","zh":"我喝啤酒。","py":"Wǒ hē píjiǔ.","th":"ฉันดื่มเบียร์"},{"sp":"A","zh":"你买什么？","py":"Nǐ mǎi shénme?","th":"คุณซื้ออะไร?"},{"sp":"B","zh":"我买词典。","py":"Wǒ mǎi cídiǎn.","th":"ฉันซื้อพจนานุกรม"}],"vocab":[{"zh":"吃","py":"chī","type":"动","en":"to eat","th":"กิน"},{"zh":"什么","py":"shénme","type":"代","en":"what","th":"อะไร"},{"zh":"饺子","py":"jiǎozi","type":"名","en":"dumpling","th":"เกี๊ยว"},{"zh":"米饭","py":"mǐfàn","type":"名","en":"cooked rice","th":"ข้าว"},{"zh":"面条","py":"miàntiáo","type":"名","en":"noodle","th":"เส้นหมี่"},{"zh":"面包","py":"miànbāo","type":"名","en":"bread","th":"ขนมปัง"},{"zh":"包子","py":"bāozi","type":"名","en":"steamed stuffed bun","th":"ซาลาเปา"},{"zh":"喝","py":"hē","type":"动","en":"to drink","th":"ดื่ม"},{"zh":"啤酒","py":"píjiǔ","type":"名","en":"beer","th":"เบียร์"},{"zh":"茶","py":"chá","type":"名","en":"tea","th":"ชา"},{"zh":"咖啡","py":"kāfēi","type":"名","en":"coffee","th":"กาแฟ"},{"zh":"矿泉水","py":"kuàngquánshuǐ","type":"名","en":"mineral water","th":"น้ำแร่"},{"zh":"牛奶","py":"niúnǎi","type":"名","en":"milk","th":"นม"},{"zh":"买","py":"mǎi","type":"动","en":"to buy","th":"ซื้อ"},{"zh":"词典","py":"cídiǎn","type":"名","en":"dictionary","th":"พจนานุกรม"},{"zh":"本子","py":"běnzi","type":"名","en":"notebook","th":"สมุด"},{"zh":"书","py":"shū","type":"名","en":"book","th":"หนังสือ"},{"zh":"笔","py":"bǐ","type":"名","en":"pen","th":"ปากกา"},{"zh":"书包","py":"shūbāo","type":"名","en":"schoolbag","th":"กระเป๋านักเรียน"}],"grammar":[{"rule":"S + V + 什么？","zh":"你 + V + 什么？","en":"Asking what someone does/eats/drinks/buys","example":"你吃什么？你喝什么？你买什么？","th":"คำถาม 什么 = อะไร? ใช้ถามสิ่งที่กระทำ"}]},"4":{"title":"多少钱","title_en":"HOW MUCH IS IT","dialogue":[{"sp":"A","zh":"这个多少钱？","py":"Zhège duōshao qián?","th":"อันนี้ราคาเท่าไหร่?"},{"sp":"B","zh":"五块钱。","py":"Wǔ kuài qián.","th":"ห้าหยวน"},{"sp":"A","zh":"我要换钱，美元换人民币。","py":"Wǒ yào huàn qián, Měiyuán huàn Rénmínbì.","th":"ฉันอยากแลกเงิน ดอลลาร์เป็นหยวน"}],"vocab":[{"zh":"要","py":"yào","type":"助动","en":"would like; to want","th":"ต้องการ"},{"zh":"换","py":"huàn","type":"动","en":"to change","th":"แลก"},{"zh":"钱","py":"qián","type":"名","en":"money","th":"เงิน"},{"zh":"多少","py":"duōshao","type":"代","en":"how much/many","th":"เท่าไหร่"},{"zh":"一","py":"yī","type":"数","en":"one","th":"หนึ่ง"},{"zh":"百","py":"bǎi","type":"数","en":"hundred","th":"ร้อย"},{"zh":"美元","py":"měiyuán","type":"名","en":"US dollar","th":"ดอลลาร์สหรัฐ"},{"zh":"二","py":"èr","type":"数","en":"two","th":"สอง"},{"zh":"三","py":"sān","type":"数","en":"three","th":"สาม"},{"zh":"四","py":"sì","type":"数","en":"four","th":"สี่"},{"zh":"五","py":"wǔ","type":"数","en":"five","th":"ห้า"},{"zh":"十","py":"shí","type":"数","en":"ten","th":"สิบ"},{"zh":"两","py":"liǎng","type":"数","en":"two (w/ measure)","th":"สอง (กับลักษณนาม)"},{"zh":"杯","py":"bēi","type":"名","en":"cup, glass","th":"แก้ว"},{"zh":"块","py":"kuài","type":"量","en":"yuan (colloquial)","th":"หยวน"},{"zh":"个","py":"gè","type":"量","en":"(general measure word)","th":"ลักษณนามทั่วไป"},{"zh":"六","py":"liù","type":"数","en":"six","th":"หก"},{"zh":"毛","py":"máo","type":"量","en":"jiao (0.1 yuan)","th":"เจี่ยว"},{"zh":"分","py":"fēn","type":"量","en":"fen (0.01 yuan)","th":"เฝิน"},{"zh":"瓶","py":"píng","type":"名","en":"bottle","th":"ขวด"},{"zh":"七","py":"qī","type":"数","en":"seven","th":"เจ็ด"},{"zh":"八","py":"bā","type":"数","en":"eight","th":"แปด"},{"zh":"本","py":"běn","type":"量","en":"(for books)","th":"เล่ม"},{"zh":"九","py":"jiǔ","type":"数","en":"nine","th":"เก้า"}],"grammar":[{"rule":"多少钱","zh":"N + 多少钱？","en":"How much is...?","example":"这个多少钱？= How much is this?","th":"ถามราคา: 多少钱?"},{"rule":"数字 1-10","zh":"一二三四五六七八九十","en":"Numbers 1-10","example":"五块 = 5 yuan, 三百 = 300","th":"ตัวเลข 1-10"}]},"5":{"title":"图书馆在哪儿","title_en":"WHERE IS THE LIBRARY","dialogue":[{"sp":"A","zh":"请问，图书馆在哪儿？","py":"Qǐngwèn, túshūguǎn zài nǎr?","th":"ขอถามหน่อย ห้องสมุดอยู่ที่ไหน?"},{"sp":"B","zh":"图书馆就在那儿。","py":"Túshūguǎn jiù zài nàr.","th":"ห้องสมุดอยู่ที่นั่นเลย"},{"sp":"A","zh":"食堂在几号楼？","py":"Shítáng zài jǐ hào lóu?","th":"โรงอาหารอยู่ตึกหมายเลขอะไร?"},{"sp":"B","zh":"食堂在三号楼。","py":"Shítáng zài sān hào lóu.","th":"โรงอาหารอยู่ตึก 3"}],"vocab":[{"zh":"请问","py":"qǐngwèn","type":"动","en":"Excuse me, may I ask...","th":"ขอถามหน่อย"},{"zh":"图书馆","py":"túshūguǎn","type":"名","en":"library","th":"ห้องสมุด"},{"zh":"在","py":"zài","type":"动/介","en":"to exist; at, in, on","th":"อยู่ที่"},{"zh":"哪儿","py":"nǎr","type":"代","en":"where","th":"ที่ไหน"},{"zh":"就","py":"jiù","type":"副","en":"just, right (emphasis)","th":"อยู่ที่นั้นเลย"},{"zh":"那儿","py":"nàr","type":"代","en":"there","th":"ที่นั่น"},{"zh":"食堂","py":"shítáng","type":"名","en":"dining hall","th":"โรงอาหาร"},{"zh":"留学生","py":"liúxuéshēng","type":"名","en":"overseas student","th":"นักศึกษาต่างชาติ"},{"zh":"宿舍","py":"sùshè","type":"名","en":"dormitory","th":"หอพัก"},{"zh":"办公室","py":"bàngōngshì","type":"名","en":"office","th":"สำนักงาน"},{"zh":"号","py":"hào","type":"名/量","en":"number","th":"หมายเลข"},{"zh":"楼","py":"lóu","type":"名","en":"building","th":"ตึก"},{"zh":"邮局","py":"yóujú","type":"名","en":"post office","th":"ที่ทำการไปรษณีย์"},{"zh":"知道","py":"zhīdào","type":"动","en":"to know","th":"รู้"},{"zh":"银行","py":"yínháng","type":"名","en":"bank","th":"ธนาคาร"}],"grammar":[{"rule":"在+地点+V","zh":"在 + place + V","en":"To do something at a location","example":"在图书馆看书 = read at the library","th":"在 + สถานที่ + กริยา = ทำ...ที่..."},{"rule":"就在","zh":"就在 + place","en":"Right at / just at (emphasis)","example":"就在这儿 = right here; 就在那儿 = right there","th":"就在 + สถานที่ = อยู่ที่...นั่นเลย"}]},"6":{"title":"我来介绍一下儿","title_en":"LET ME INTRODUCE","dialogue":[{"sp":"保罗","zh":"你们好，认识你们很高兴。我来介绍一下儿，我是德国留学生保罗，我学习汉语。我是A班的学生。这是我们的老师。那是我朋友西蒙和李英男。","py":"Nǐmen hǎo, rènshi nǐmen hěn gāoxìng. Wǒ lái jièshào yīxiàr...","th":"สวัสดีทุกคน ยินดีที่ได้รู้จัก ขอแนะนำตัวสักหน่อย ฉันชื่อพอล นักศึกษาจากเยอรมนี เรียนภาษาจีน..."}],"vocab":[{"zh":"认识","py":"rènshi","type":"动","en":"to meet, to know","th":"รู้จัก"},{"zh":"高兴","py":"gāoxìng","type":"形","en":"happy","th":"ดีใจ"},{"zh":"来","py":"lái","type":"动","en":"to come (indicates action)","th":"มา (แสดงการกระทำ)"},{"zh":"介绍","py":"jièshào","type":"动","en":"to introduce","th":"แนะนำ"},{"zh":"一下儿","py":"yīxiàr","type":"数量","en":"a moment, briefly","th":"สักหน่อย"},{"zh":"是","py":"shì","type":"动","en":"to be","th":"เป็น/คือ"},{"zh":"学习","py":"xuéxí","type":"动","en":"to learn, to study","th":"เรียน"},{"zh":"汉语","py":"Hànyǔ","type":"名","en":"Chinese language","th":"ภาษาจีน"},{"zh":"班","py":"bān","type":"名/量","en":"class","th":"ชั้นเรียน"},{"zh":"的","py":"de","type":"助","en":"of (possessive)","th":"อนุภาคแสดงความเป็นเจ้าของ"},{"zh":"学生","py":"xuésheng","type":"名","en":"student","th":"นักเรียน"},{"zh":"这","py":"zhè","type":"代","en":"this","th":"นี่"},{"zh":"我们","py":"wǒmen","type":"代","en":"we, us","th":"พวกเรา"},{"zh":"那","py":"nà","type":"代","en":"that","th":"นั่น"},{"zh":"朋友","py":"péngyou","type":"名","en":"friend","th":"เพื่อน"},{"zh":"和","py":"hé","type":"连/介","en":"and; with","th":"และ"},{"zh":"人","py":"rén","type":"名","en":"people","th":"คน"},{"zh":"教室","py":"jiàoshì","type":"名","en":"classroom","th":"ห้องเรียน"},{"zh":"大","py":"dà","type":"形","en":"big","th":"ใหญ่"},{"zh":"新","py":"xīn","type":"形","en":"new","th":"ใหม่"},{"zh":"同学","py":"tóngxué","type":"名","en":"classmate","th":"เพื่อนร่วมชั้น"},{"zh":"漂亮","py":"piàoliang","type":"形","en":"pretty, beautiful","th":"สวย"},{"zh":"聪明","py":"cōngming","type":"形","en":"clever","th":"ฉลาด"},{"zh":"可爱","py":"kě'ài","type":"形","en":"lovely","th":"น่ารัก"},{"zh":"帅","py":"shuài","type":"形","en":"handsome","th":"หล่อ"}],"grammar":[{"rule":"是字句(1)","zh":"S + 是 + N","en":"The 是 sentence (1): identification","example":"我是德国留学生。= I am a German student.","th":"ประโยค是: ระบุตัวตน"},{"rule":"定语+的","zh":"Attr + 的 + N","en":"Attributive with structural particle 的","example":"我的书 = my book; A班的学生 = students of class A","th":"的 ใช้แสดงความเป็นเจ้าของหรือขยายคำนาม"},{"rule":"形容词谓语","zh":"S + (很) + Adj","en":"Sentence with adjectival predicate","example":"她很漂亮。= She is beautiful.","th":"คุณศัพท์เป็นภาคแสดงโดยตรง (มักมี 很)"}]},"7":{"title":"你身体好吗","title_en":"HOW IS YOUR HEALTH","dialogue":[{"sp":"中国朋友","zh":"最近你身体好吗？","py":"Zuìjìn nǐ shēntǐ hǎo ma?","th":"ช่วงนี้สุขภาพเป็นอย่างไรบ้าง?"},{"sp":"西蒙","zh":"我身体很好。你学习忙吗？","py":"Wǒ shēntǐ hěn hǎo. Nǐ xuéxí máng ma?","th":"สุขภาพดีมาก คุณเรียนยุ่งไหม?"},{"sp":"中国朋友","zh":"我学习比较忙。你成绩好吗？","py":"Wǒ xuéxí bǐjiào máng. Nǐ chéngjì hǎo ma?","th":"ยุ่งค่อนข้างมาก ผลการเรียนคุณดีไหม?"},{"sp":"西蒙","zh":"马马虎虎。你的宿舍大不大？","py":"Māmahūhū. Nǐ de sùshè dà bu dà?","th":"พอใช้ได้ หอพักของคุณใหญ่ไหม?"},{"sp":"中国朋友","zh":"我的宿舍不太大，宿舍里有空调。","py":"Wǒ de sùshè bú tài dà, sùshè lǐ yǒu kōngtiáo.","th":"หอพักฉันไม่ค่อยใหญ่ แต่มีแอร์"}],"vocab":[{"zh":"最近","py":"zuìjìn","type":"名","en":"recently","th":"เร็วๆ นี้"},{"zh":"身体","py":"shēntǐ","type":"名","en":"health, body","th":"สุขภาพ; ร่างกาย"},{"zh":"比较","py":"bǐjiào","type":"副","en":"quite, relatively","th":"ค่อนข้าง"},{"zh":"成绩","py":"chéngjì","type":"名","en":"score, grade","th":"ผลการเรียน"},{"zh":"马马虎虎","py":"māmahūhū","type":"形","en":"so-so","th":"พอใช้ได้"},{"zh":"努力","py":"nǔlì","type":"形","en":"hard-working","th":"ขยัน"},{"zh":"非常","py":"fēicháng","type":"副","en":"very, extremely","th":"มากมาย"},{"zh":"太","py":"tài","type":"副","en":"very, too","th":"เกินไป"},{"zh":"里","py":"lǐ","type":"名","en":"in, inside","th":"ใน"},{"zh":"空调","py":"kōngtiáo","type":"名","en":"air conditioner","th":"แอร์"},{"zh":"没有","py":"méiyǒu","type":"动","en":"to not have","th":"ไม่มี"},{"zh":"同屋","py":"tóngwū","type":"名","en":"roommate","th":"เพื่อนร่วมห้อง"},{"zh":"离","py":"lí","type":"介","en":"from (distance)","th":"ห่างจาก"},{"zh":"远","py":"yuǎn","type":"形","en":"far","th":"ไกล"},{"zh":"近","py":"jìn","type":"形","en":"near","th":"ใกล้"}],"grammar":[{"rule":"主谓谓语句","zh":"S₁ + S₂ + P","en":"Subject-predicate predicate sentence","example":"我身体很好。= I, (my) body is very good.","th":"ประโยคที่ภาคแสดงมีโครงสร้าง S+P"},{"rule":"吗-question","zh":"S + V/Adj + 吗？","en":"Yes/no question with 吗","example":"你身体好吗？= Are you healthy?","th":"ประโยคถาม ใช้ 吗"},{"rule":"正反疑问句","zh":"V + 不 + V / Adj + 不 + Adj","en":"Affirmative-negative question","example":"大不大？有没有？= Big or not? Have or not?","th":"คำถาม V/Adj + 不 + V/Adj"},{"rule":"有字句","zh":"S + 有 + O","en":"The 有 sentence (possession/existence)","example":"宿舍里有空调。= The dorm has A/C.","th":"有 แสดงการมีอยู่หรือครอบครอง"}]},"8":{"title":"你是哪国人","title_en":"WHICH COUNTRY ARE YOU FROM","dialogue":[{"sp":"A","zh":"你是哪国人？","py":"Nǐ shì nǎ guó rén?","th":"คุณเป็นคนชาติไหน?"},{"sp":"B","zh":"我是泰国人，我在哪儿学习？","py":"Wǒ shì Tàiguó rén. Nǐ zài nǎr xuéxí?","th":"ฉันเป็นคนไทย คุณเรียนอยู่ที่ไหน?"},{"sp":"A","zh":"我在北京语言大学学习汉语，你们班有多少留学生？","py":"Wǒ zài Běijīng Yǔyán Dàxué xuéxí Hànyǔ. Nǐmen bān yǒu duōshao liúxuéshēng?","th":"ฉันเรียนภาษาจีนที่มหาวิทยาลัยภาษาปักกิ่ง ในชั้นของคุณมีนักศึกษาต่างชาติกี่คน?"},{"sp":"B","zh":"我们班有二十个留学生，来自十个国家。","py":"Wǒmen bān yǒu èrshí gè liúxuéshēng, láizì shí gè guójiā.","th":"ในชั้นมีนักศึกษาต่างชาติ 20 คน มาจาก 10 ประเทศ"}],"vocab":[{"zh":"哪","py":"nǎ","type":"代","en":"which","th":"ไหน"},{"zh":"国","py":"guó","type":"名","en":"country","th":"ประเทศ"},{"zh":"中国","py":"Zhōngguó","type":"专名","en":"China","th":"จีน"},{"zh":"美国","py":"Měiguó","type":"专名","en":"USA","th":"สหรัฐอเมริกา"},{"zh":"英国","py":"Yīngguó","type":"专名","en":"UK","th":"อังกฤษ"},{"zh":"日本","py":"Rìběn","type":"专名","en":"Japan","th":"ญี่ปุ่น"},{"zh":"韩国","py":"Hánguó","type":"专名","en":"Korea","th":"เกาหลี"},{"zh":"泰国","py":"Tàiguó","type":"专名","en":"Thailand","th":"ไทย"},{"zh":"法国","py":"Fǎguó","type":"专名","en":"France","th":"ฝรั่งเศส"},{"zh":"德国","py":"Déguó","type":"专名","en":"Germany","th":"เยอรมนี"},{"zh":"来","py":"lái","type":"动","en":"to come","th":"มา"},{"zh":"学习","py":"xuéxí","type":"动","en":"to study","th":"เรียน"},{"zh":"大学","py":"dàxué","type":"名","en":"university","th":"มหาวิทยาลัย"},{"zh":"多少","py":"duōshao","type":"代","en":"how many","th":"เท่าไหร่"}],"grammar":[{"rule":"疑问句(2)","zh":"WH-word questions","en":"Interrogative sentences with question words","example":"你是哪国人？你在哪儿学习？","th":"ประโยคคำถามด้วย WH-words (哪/什么/谁/哪儿)"},{"rule":"介词结构","zh":"在/从/到 + place","en":"Prepositional construction","example":"在北京学习 = study in Beijing","th":"กลุ่มคำบุพบท: 在/从/到 + สถานที่"},{"rule":"几和多少","zh":"几 (expected small) vs 多少 (any)","en":"几 for expected small numbers, 多少 for any","example":"几口人？几岁？vs 多少人？多少钱？","th":"几 ถามจำนวนที่คาดว่าน้อย, 多少 ถามทุกจำนวน"},{"rule":"数量短语作定语","zh":"数 + 量 + N (as attributive)","en":"Quantitative phrases as attributives","example":"一个留学生 = one international student","th":"ตัวเลข + ลักษณนาม + คำนาม เป็นคำขยาย"}]},"9":{"title":"你家有几口人","title_en":"HOW MANY PEOPLE ARE THERE IN YOUR FAMILY","dialogue":[{"sp":"A","zh":"你家有几口人？","py":"Nǐ jiā yǒu jǐ kǒu rén?","th":"ครอบครัวคุณมีกี่คน?"},{"sp":"B","zh":"我家有四口人：爸爸、妈妈、哥哥和我。你呢？","py":"Wǒ jiā yǒu sì kǒu rén: bàba, māma, gēge hé wǒ. Nǐ ne?","th":"มีสี่คน: พ่อ แม่ พี่ชาย และฉัน แล้วคุณล่ะ?"},{"sp":"A","zh":"我家有三口人。你爸爸做什么工作？","py":"Wǒ jiā yǒu sān kǒu rén. Nǐ bàba zuò shénme gōngzuò?","th":"มีสามคน พ่อของคุณทำงานอะไร?"},{"sp":"B","zh":"他是医生，我妈妈是护士。你今年多大？","py":"Tā shì yīshēng, wǒ māma shì hùshi. Nǐ jīnnián duō dà?","th":"เขาเป็นหมอ แม่ฉันเป็นพยาบาล คุณอายุเท่าไหร่ปีนี้?"},{"sp":"A","zh":"我今年二十岁。","py":"Wǒ jīnnián èrshí suì.","th":"ปีนี้ฉันอายุยี่สิบปี"}],"vocab":[{"zh":"口","py":"kǒu","type":"量","en":"(measure for family members)","th":"(ลักษณนามสำหรับสมาชิกครอบครัว)"},{"zh":"工作","py":"gōngzuò","type":"动/名","en":"to work; job","th":"ทำงาน; งาน"},{"zh":"医生","py":"yīshēng","type":"名","en":"doctor","th":"แพทย์"},{"zh":"护士","py":"hùshi","type":"名","en":"nurse","th":"พยาบาล"},{"zh":"今年","py":"jīnnián","type":"名","en":"this year","th":"ปีนี้"},{"zh":"多大","py":"duō dà","type":"","en":"how old","th":"อายุเท่าไหร่"},{"zh":"岁","py":"suì","type":"量","en":"year of age","th":"ขวบ; ปี (อายุ)"},{"zh":"做","py":"zuò","type":"动","en":"to do","th":"ทำ"},{"zh":"老师","py":"lǎoshī","type":"名","en":"teacher","th":"ครู"},{"zh":"工程师","py":"gōngchéngshī","type":"名","en":"engineer","th":"วิศวกร"}],"grammar":[{"rule":"询问家庭人口","zh":"你家有几口人？","en":"Asking about the number of family members","example":"我家有四口人。= My family has 4 people.","th":"ถามจำนวนสมาชิกครอบครัว ใช้ 几口人"},{"rule":"询问职业","zh":"你（爸爸）做什么工作？","en":"Asking about professions","example":"他是医生。= He is a doctor.","th":"ถามอาชีพ: 做什么工作?"},{"rule":"询问年龄","zh":"你今年多大？","en":"Asking about age","example":"我今年二十岁。= I am 20 years old this year.","th":"ถามอายุ: 多大? (ผู้ใหญ่) / 几岁? (เด็ก)"}]},"10":{"title":"现在几点","title_en":"WHAT TIME IS IT NOW","dialogue":[{"sp":"A","zh":"现在几点？","py":"Xiànzài jǐ diǎn?","th":"ตอนนี้กี่โมงแล้ว?"},{"sp":"B","zh":"现在两点半。","py":"Xiànzài liǎng diǎn bàn.","th":"ตอนนี้สองโมงครึ่ง"},{"sp":"A","zh":"你每天几点起床？","py":"Nǐ měi tiān jǐ diǎn qǐchuáng?","th":"คุณตื่นนอนกี่โมงทุกวัน?"},{"sp":"B","zh":"我每天七点起床，八点上课。","py":"Wǒ měi tiān qī diǎn qǐchuáng, bā diǎn shàng kè.","th":"ฉันตื่นทุกวันเจ็ดโมง เข้าเรียนแปดโมง"},{"sp":"A","zh":"今天几月几号，星期几？","py":"Jīntiān jǐ yuè jǐ hào, xīngqī jǐ?","th":"วันนี้วันที่เท่าไหร่ เดือนอะไร วันอะไร?"},{"sp":"B","zh":"今天三月十五号，星期五。","py":"Jīntiān sān yuè shíwǔ hào, Xīngqīwǔ.","th":"วันนี้ 15 มีนาคม วันศุกร์"}],"vocab":[{"zh":"现在","py":"xiànzài","type":"名","en":"now","th":"ตอนนี้"},{"zh":"点","py":"diǎn","type":"量","en":"o'clock","th":"โมง"},{"zh":"半","py":"bàn","type":"数","en":"half","th":"ครึ่ง"},{"zh":"每天","py":"měi tiān","type":"","en":"every day","th":"ทุกวัน"},{"zh":"起床","py":"qǐ chuáng","type":"动","en":"to get up","th":"ตื่นนอน"},{"zh":"上课","py":"shàng kè","type":"动","en":"to attend class","th":"เข้าเรียน"},{"zh":"月","py":"yuè","type":"名/量","en":"month","th":"เดือน"},{"zh":"号","py":"hào","type":"名/量","en":"date","th":"วันที่"},{"zh":"星期","py":"xīngqī","type":"名","en":"week","th":"สัปดาห์"},{"zh":"分","py":"fēn","type":"量","en":"minute","th":"นาที"},{"zh":"刻","py":"kè","type":"量","en":"quarter hour","th":"สิบห้านาที"},{"zh":"差","py":"chà","type":"动","en":"to lack, to be short of","th":"ขาด; อีก"}],"grammar":[{"rule":"名词谓语句","zh":"S + Time/Number","en":"Sentence with nominal predicate","example":"今天星期五。= Today is Friday.","th":"คำนามเป็นภาคแสดง (ไม่ต้องใช้ 是)"},{"rule":"钟点读法","zh":"时 + 分 + 刻 + 半","en":"Ways of telling the time","example":"两点半 = 2:30; 差五分三点 = 2:55","th":"การบอกเวลา: 点/刻/半/差"},{"rule":"年月日星期","zh":"年/月/号/星期","en":"Expressing year, month, date, week","example":"三月十五号，星期五 = March 15, Friday","th":"บอกวัน เดือน ปี: ใหญ่ → เล็ก"}]},"11":{"title":"办公楼在教学楼北边","title_en":"THE ADMIN BUILDING IS NORTH OF TEACHING BUILDING","dialogue":[{"sp":"A","zh":"请问，银行在哪儿？","py":"Qǐngwèn, yínháng zài nǎr?","th":"ขอถามหน่อย ธนาคารอยู่ที่ไหน?"},{"sp":"B","zh":"银行就在教学楼北边。","py":"Yínháng jiù zài jiàoxuélóu běibiān.","th":"ธนาคารอยู่ทางเหนือของตึกเรียน"},{"sp":"A","zh":"图书馆旁边有没有邮局？","py":"Túshūguǎn pángbiān yǒu méiyǒu yóujú?","th":"ข้างๆ ห้องสมุดมีที่ทำการไปรษณีย์ไหม?"},{"sp":"B","zh":"有，在图书馆西边。","py":"Yǒu, zài túshūguǎn xībiān.","th":"มี อยู่ทางตะวันตกของห้องสมุด"}],"vocab":[{"zh":"教学楼","py":"jiàoxuélóu","type":"名","en":"teaching building","th":"ตึกเรียน"},{"zh":"北边","py":"běibiān","type":"名","en":"north side","th":"ทางเหนือ"},{"zh":"南边","py":"nánbiān","type":"名","en":"south side","th":"ทางใต้"},{"zh":"东边","py":"dōngbiān","type":"名","en":"east side","th":"ทางตะวันออก"},{"zh":"西边","py":"xībiān","type":"名","en":"west side","th":"ทางตะวันตก"},{"zh":"旁边","py":"pángbiān","type":"名","en":"beside, next to","th":"ข้างๆ"},{"zh":"前边","py":"qiánbiān","type":"名","en":"in front","th":"ข้างหน้า"},{"zh":"后边","py":"hòubiān","type":"名","en":"behind","th":"ข้างหลัง"},{"zh":"左边","py":"zuǒbiān","type":"名","en":"left side","th":"ด้านซ้าย"},{"zh":"右边","py":"yòubiān","type":"名","en":"right side","th":"ด้านขวา"},{"zh":"里边","py":"lǐbiān","type":"名","en":"inside","th":"ข้างใน"},{"zh":"外边","py":"wàibiān","type":"名","en":"outside","th":"ข้างนอก"}],"grammar":[{"rule":"存在句","zh":"Place + 有/是 + Object","en":"Sentences indicating existence","example":"图书馆旁边有邮局。= There is a post office next to the library.","th":"ประโยคบอกการมีอยู่: ที่ + 有 + สิ่งของ"},{"rule":"方位词","zh":"东/南/西/北/旁/前/后/左/右/里/外 + 边","en":"Nouns of locality (direction words)","example":"北边 = north side; 旁边 = next to","th":"คำบอกทิศทาง/ตำแหน่ง"}]},"12":{"title":"要红的还是要蓝的","title_en":"WHAT DO YOU WANT, RED OR BLUE","dialogue":[{"sp":"A","zh":"你要哪件衬衫，红的还是蓝的？","py":"Nǐ yào nǎ jiàn chènshān, hóng de háishi lán de?","th":"คุณต้องการเสื้อเชิ้ตตัวไหน สีแดงหรือสีน้ำเงิน?"},{"sp":"B","zh":"我要红的，多少钱？","py":"Wǒ yào hóng de, duōshao qián?","th":"ฉันเอาสีแดง ราคาเท่าไหร่?"},{"sp":"A","zh":"两百五十块，贵不贵？","py":"Liǎngbǎi wǔshí kuài, guì bu guì?","th":"สองร้อยห้าสิบหยวน แพงไหม?"},{"sp":"B","zh":"不太贵，便宜一点儿吧。","py":"Bú tài guì, piányī yīdiǎnr ba.","th":"ไม่ค่อยแพง ลดหน่อยได้ไหม"}],"vocab":[{"zh":"件","py":"jiàn","type":"量","en":"(for clothes)","th":"(ลักษณนามสำหรับเสื้อผ้า)"},{"zh":"衬衫","py":"chènshān","type":"名","en":"shirt","th":"เสื้อเชิ้ต"},{"zh":"红","py":"hóng","type":"形","en":"red","th":"สีแดง"},{"zh":"蓝","py":"lán","type":"形","en":"blue","th":"สีน้ำเงิน"},{"zh":"贵","py":"guì","type":"形","en":"expensive","th":"แพง"},{"zh":"便宜","py":"piányī","type":"形","en":"cheap","th":"ถูก"},{"zh":"一点儿","py":"yīdiǎnr","type":"","en":"a little bit","th":"นิดหน่อย"},{"zh":"颜色","py":"yánsè","type":"名","en":"color","th":"สี"},{"zh":"白","py":"bái","type":"形","en":"white","th":"ขาว"},{"zh":"黑","py":"hēi","type":"形","en":"black","th":"ดำ"},{"zh":"黄","py":"huáng","type":"形","en":"yellow","th":"เหลือง"},{"zh":"绿","py":"lǜ","type":"形","en":"green","th":"เขียว"},{"zh":"号","py":"hào","type":"名/量","en":"size; number","th":"ไซส์; หมายเลข"}],"grammar":[{"rule":"的字结构","zh":"Adj + 的 (= noun)","en":"的 construction replacing a noun","example":"红的 = the red one; 大的 = the big one","th":"形 + 的 แทนคำนาม (อันที่...)"},{"rule":"选择疑问句","zh":"A + 还是 + B？","en":"Alternative questions with 还是","example":"红的还是蓝的？= red or blue?","th":"คำถามทางเลือก A 还是 B?"},{"rule":"钱的计算","zh":"元/块, 角/毛, 分","en":"Counting money","example":"两块五 = 2.5 yuan; 三毛五 = 0.35 yuan","th":"การนับเงิน: หยวน/เจี่ยว/เฝิน"}]},"13":{"title":"您给我介绍介绍","title_en":"PLEASE GIVE ME A BRIEF INTRODUCTION","dialogue":[{"sp":"A","zh":"您好！我想去旅行，您能给我介绍介绍吗？","py":"Nín hǎo! Wǒ xiǎng qù lǚxíng, nín néng gěi wǒ jièshào jièshào ma?","th":"สวัสดีครับ ฉันอยากไปท่องเที่ยว คุณช่วยแนะนำให้ฉันหน่อยได้ไหม?"},{"sp":"B","zh":"当然可以。你又想学汉语又想旅行？","py":"Dāngrán kěyǐ. Nǐ yòu xiǎng xué Hànyǔ yòu xiǎng lǚxíng?","th":"แน่นอนได้ คุณอยากเรียนภาษาจีนด้วยอยากท่องเที่ยวด้วยเหรอ?"},{"sp":"A","zh":"对，我想先去上海看看，再去北京一下儿。","py":"Duì, wǒ xiǎng xiān qù Shànghǎi kàn kàn, zài qù Běijīng yīxiàr.","th":"ใช่ ฉันอยากไปดูเซี่ยงไฮ้ก่อน แล้วก็ไปปักกิ่งสักหน่อย"}],"vocab":[{"zh":"能","py":"néng","type":"助动","en":"can, to be able to","th":"สามารถ"},{"zh":"想","py":"xiǎng","type":"助动","en":"would like to, to think","th":"อยากจะ"},{"zh":"给","py":"gěi","type":"动/介","en":"to give; for","th":"ให้"},{"zh":"旅行","py":"lǚxíng","type":"动","en":"to travel","th":"เดินทาง"},{"zh":"当然","py":"dāngrán","type":"副","en":"of course","th":"แน่นอน"},{"zh":"可以","py":"kěyǐ","type":"助动","en":"can, may","th":"ได้"},{"zh":"先","py":"xiān","type":"副","en":"first","th":"ก่อน"},{"zh":"再","py":"zài","type":"副","en":"then, again","th":"แล้ว; อีก"},{"zh":"看","py":"kàn","type":"动","en":"to look, to visit","th":"ดู; เยี่ยม"},{"zh":"喜欢","py":"xǐhuan","type":"动","en":"to like","th":"ชอบ"},{"zh":"书法","py":"shūfǎ","type":"名","en":"calligraphy","th":"การเขียนพู่กัน"},{"zh":"京剧","py":"jīngjù","type":"名","en":"Peking opera","th":"งิ้วปักกิ่ง"}],"grammar":[{"rule":"能愿动词(1)","zh":"想/要 + V","en":"Modal verbs: 想 (want to) and 要 (will/want)","example":"我想去旅行。= I want to travel.","th":"助动词 想/要: อยากจะ/จะ"},{"rule":"动词重叠","zh":"V + V / VV","en":"Reduplication of verbs","example":"看看 = take a look; 介绍介绍 = introduce briefly","th":"กริยาซ้ำ = ทำสักหน่อย ทำแบบสั้นๆ"},{"rule":"又...又...","zh":"又 + V/Adj + 又 + V/Adj","en":"Both...and..., as well as","example":"又想学又想旅行 = want to both study and travel","th":"又...又... = ทั้ง...และ..."},{"rule":"一点儿/有一点儿","zh":"一点儿 vs 有一点儿","en":"一点儿 = a little (after adj); 有一点儿 = a bit (before adj)","example":"便宜一点儿 vs 有一点儿贵","th":"一点儿 วางหลัง Adj; 有一点儿 วางหน้า Adj"}]},"14":{"title":"咱们去尝尝，好吗","title_en":"LET'S HAVE A TASTE, SHALL WE","dialogue":[{"sp":"A","zh":"咱们去尝尝那家饭馆，好吗？","py":"Zánmen qù chángcháng nà jiā fànguǎn, hǎo ma?","th":"พวกเราไปลองร้านอาหารนั้นกันดีไหม?"},{"sp":"B","zh":"好啊，那家饭馆是四川菜还是广东菜？","py":"Hǎo a, nà jiā fànguǎn shì Sìchuān cài háishi Guǎngdōng cài?","th":"โอเค ร้านนั้นเป็นอาหารเสฉวนหรืออาหารกวางตุ้ง?"},{"sp":"A","zh":"是北京菜，他们的北京烤鸭最有名。","py":"Shì Běijīng cài, tāmen de Běijīng kǎoyā zuì yǒumíng.","th":"เป็นอาหารปักกิ่ง เป็ดย่างปักกิ่งของเขาขึ้นชื่อที่สุด"},{"sp":"B","zh":"太好了，我请你，好吗？","py":"Tài hǎo le, wǒ qǐng nǐ, hǎo ma?","th":"ดีมากเลย ฉันเลี้ยงคุณนะ ดีไหม?"}],"vocab":[{"zh":"咱们","py":"zánmen","type":"代","en":"we (inclusive)","th":"พวกเรา (รวมผู้ฟัง)"},{"zh":"尝","py":"cháng","type":"动","en":"to taste","th":"ลิ้มรส"},{"zh":"饭馆","py":"fànguǎn","type":"名","en":"restaurant","th":"ร้านอาหาร"},{"zh":"菜","py":"cài","type":"名","en":"dish, food","th":"อาหาร; ผัก"},{"zh":"请","py":"qǐng","type":"动","en":"to invite, to treat","th":"เชิญ; เลี้ยง"},{"zh":"最","py":"zuì","type":"副","en":"most","th":"ที่สุด"},{"zh":"有名","py":"yǒumíng","type":"形","en":"famous","th":"มีชื่อเสียง"},{"zh":"好吗","py":"hǎo ma","type":"","en":"OK? / Shall we?","th":"ได้ไหม? / โอเคไหม?"},{"zh":"来","py":"lái","type":"动","en":"to have (ordering food)","th":"เอา (สั่งอาหาร)"},{"zh":"瓶","py":"píng","type":"名/量","en":"bottle","th":"ขวด"},{"zh":"碗","py":"wǎn","type":"名/量","en":"bowl","th":"ชาม"},{"zh":"盘","py":"pán","type":"名/量","en":"plate","th":"จาน"}],"grammar":[{"rule":"……好吗","zh":"Suggest + 好吗？","en":"Tag question with 好吗","example":"咱们去，好吗？= Let's go, shall we?","th":"ข้อเสนอ + 好吗? = ...ดีไหม?"},{"rule":"……是……","zh":"S + 是 + clause","en":"The construction 是...","example":"那家饭馆是四川菜还是广东菜？","th":"... 是 ... แสดงการระบุหรือยืนยัน"},{"rule":"双宾语句","zh":"S + V + IO + DO","en":"Sentences with two objects","example":"我请你(吃饭)。= I'll treat you (to a meal).","th":"กริยาสองกรรม: V + กรรมทางอ้อม + กรรมตรง"}]},"15":{"title":"去邮局怎么走","title_en":"HOW CAN I GET TO THE POST OFFICE","dialogue":[{"sp":"A","zh":"请问，去邮局怎么走？","py":"Qǐngwèn, qù yóujú zěnme zǒu?","th":"ขอถามหน่อย ไปที่ทำการไปรษณีย์ไปทางไหน?"},{"sp":"B","zh":"你一直走，到路口往左拐，走大概五分钟就到了。","py":"Nǐ yīzhí zǒu, dào lùkǒu wǎng zuǒ guǎi, zǒu dàgài wǔ fēnzhōng jiù dào le.","th":"คุณเดินตรงไป ถึงทางแยกให้เลี้ยวซ้าย เดินประมาณห้านาทีก็ถึง"},{"sp":"A","zh":"从这儿到邮局有多远？","py":"Cóng zhèr dào yóujú yǒu duō yuǎn?","th":"จากที่นี่ไปถึงที่ทำการไปรษณีย์ไกลแค่ไหน?"},{"sp":"B","zh":"不太远，大概七八百米。","py":"Bú tài yuǎn, dàgài qī bā bǎi mǐ.","th":"ไม่ไกลมาก ประมาณเจ็ดแปดร้อยเมตร"}],"vocab":[{"zh":"怎么","py":"zěnme","type":"代","en":"how; why","th":"อย่างไร; ทำไม"},{"zh":"走","py":"zǒu","type":"动","en":"to walk, to go","th":"เดิน; ไป"},{"zh":"一直","py":"yīzhí","type":"副","en":"straight, all the way","th":"ตรงไป"},{"zh":"路口","py":"lùkǒu","type":"名","en":"intersection","th":"ทางแยก"},{"zh":"往","py":"wǎng","type":"介","en":"towards","th":"ไปทาง"},{"zh":"左","py":"zuǒ","type":"名","en":"left","th":"ซ้าย"},{"zh":"右","py":"yòu","type":"名","en":"right","th":"ขวา"},{"zh":"拐","py":"guǎi","type":"动","en":"to turn","th":"เลี้ยว"},{"zh":"大概","py":"dàgài","type":"副","en":"approximately","th":"ประมาณ"},{"zh":"从","py":"cóng","type":"介","en":"from","th":"จาก"},{"zh":"到","py":"dào","type":"介/动","en":"to, until","th":"ถึง"},{"zh":"米","py":"mǐ","type":"量","en":"meter","th":"เมตร"},{"zh":"还是……吧","py":"háishi...ba","type":"","en":"It's better to...","th":"ดีกว่าที่จะ..."}],"grammar":[{"rule":"用多提问","zh":"多 + Adj (多远/多长/多高)","en":"Questions with interrogative pronoun 多","example":"从这儿到邮局有多远？= How far is it from here?","th":"多 + คุณศัพท์ ถามขนาด/ระยะ"},{"rule":"概数","zh":"数 + 多 / 两三 / 七八","en":"Approximate numbers","example":"七八百米 = 700-800 meters; 两三个 = 2-3","th":"ตัวเลขโดยประมาณ: สองตัวเลขติดกัน หรือ ตัวเลข+多"},{"rule":"还是……吧","zh":"还是 + V + 吧","en":"The construction 还是……吧","example":"还是打车去吧。= It's better to take a taxi.","th":"还是...吧 = น่าจะ...ดีกว่า"}]}}}}};
+
+const BKC={hanyu_1a:'#27ae60',hanyu_1b:'#2471a3',speaking:'#e67e22'};
+const BKL={hanyu_1a:'1A',hanyu_1b:'1B',speaking:'口语'};
+let curBk='hanyu_1a',curLn=1,curView='lesson';
+let fcW=[],fcI=0,fcMode='zh2th',fcFlipped=false;
+let qMode='c4',qW=[],qI=0,qSc=0,qWr=0;
+let idxF='all';
+let HW=null,smWord=null;
+
+/* ── SIDEBAR ── */
+function buildSB(){
+  const sb=document.getElementById('sb');
+  sb.innerHTML='';
+  Object.entries(D.books).forEach(([bk,bv])=>{
+    sb.insertAdjacentHTML('beforeend',`<div class="sb-bk"><span class="sb-dot" style="background:${BKC[bk]}"></span>${bv.name_th||bv.name_en}</div>`);
+    Object.entries(bv.lessons).forEach(([ln,lv])=>{
+      const n=parseInt(ln);
+      const vc=lv.vocab||lv.words||[];
+      const d=document.createElement('div');
+      d.className='sbi';d.id=`sb-${bk}-${n}`;
+      d.onclick=()=>showLesson(bk,n);
+      d.innerHTML=`<div class="sbi-n">${n}</div>
+        <div class="sbi-t"><div class="sbi-zh">${lv.title}</div><div class="sbi-en">${lv.title_en}</div></div>
+        <div class="sbi-c">${vc.length}</div>`;
+      sb.appendChild(d);
+    });
+  });
+}
+
+function setActive(bk,n){
+  document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));
+  const el=document.getElementById(`sb-${bk}-${n}`);
+  if(el){el.classList.add('on');el.scrollIntoView({block:'nearest'});}
+  curBk=bk;curLn=n;
+  const lv=D.books[bk].lessons[n.toString()];
+  fcW=lv?lv.vocab||lv.words||[]:[];
+  fcI=0;fcFlipped=false;
+}
+
+/* ── LESSON ── */
+function showLesson(bk,n){
+  setActive(bk,n);
+  // Don't hijack quiz/flashcard views when user picks lesson from sidebar
+  const stayViews=['quiz','flashcard','grammar','index'];
+  if(!stayViews.includes(curView)){
+    goView('lesson');
+  } else if(curView==='flashcard'){
+    updateFC();
+  } else if(curView==='quiz'){
+    startQuiz();
+    return; // startQuiz calls goView itself, skip lesson render below
+  }
+  const lv=D.books[bk].lessons[n.toString()];
+  if(!lv)return;
+  const vc=lv.vocab||lv.words||[];
+  const col=BKC[bk];
+  const spColors=['#c0392b','#2471a3','#8e44ad','#27ae60','#e67e22'];
+  const spks=[...new Set((lv.dialogue||[]).map(d=>d.sp||d.speaker||'A'))];
+  const spMap={};spks.forEach((s,i)=>{spMap[s]=spColors[i%spColors.length];});
+
+  const dlHTML=lv.dialogue?.length?`
+    <div class="sec"><span>💬</span>บทสนทนา</div>
+    <div class="dlg">${lv.dialogue.map(d=>{
+      const sp=d.sp||d.speaker||'A';
+      const c=spMap[sp]||spColors[0];
+      const lb=sp.length<=2?sp:sp.slice(0,2);
+      return `<div class="dl">
+        <div class="dl-sp" style="background:${c}">${lb}</div>
+        <div>
+          <div class="dl-zh">${d.zh}</div>
+          ${d.py?`<div class="dl-py">${d.py}</div>`:''}
+          ${d.th?`<div class="dl-th">${d.th}</div>`:''}
+        </div></div>`;}).join('')}
+    </div>`:''
+
+  const ksHTML=lv.key_sentences?.length?`
+    <div class="sec"><span>⭐</span>ประโยคสำคัญ</div>
+    ${lv.key_sentences.map(s=>`<div class="ks">${s}</div>`).join('')}`:'';
+
+  const grHTML=lv.grammar?.length?`
+    <div class="sec"><span>📐</span>ไวยากรณ์</div>
+    ${lv.grammar.map(g=>`
+      <div class="gc">
+        <div class="gc-h"><span class="gc-tag">${g.rule}</span><span class="gc-ttl">${g.zh}</span></div>
+        <div class="gc-b">
+          <div class="gc-pat">${g.zh}</div>
+          <div class="gc-exp">${g.en}</div>
+          <div class="gc-ex">
+            <div class="gc-ex-zh">${(g.example||'').split('=')[0]?.trim()}</div>
+            ${g.example?.includes('=')?`<div>${g.example.split('=').slice(1).join('=').trim()}</div>`:''}
+            <div class="gc-ex-th">${g.th||''}</div>
+          </div>
+        </div>
+      </div>`).join('')}`:'';
+
+  const vtHTML=vc.length?`
+    <div class="sec"><span>📝</span>คำศัพท์ (${vc.length} คำ)</div>
+    <div class="vt-w"><table class="vt">
+      <thead><tr><th>อักษร</th><th>พินอิน</th><th>ประเภท</th><th>English</th><th>ภาษาไทย</th><th>ขีด</th></tr></thead>
+      <tbody>${vc.map(w=>`<tr>
+        <td><span class="vt-zh">${w.zh}</span></td>
+        <td><span class="vt-py">${w.py}</span></td>
+        <td>${w.type?`<span class="vt-type">${w.type}</span>`:''}</td>
+        <td>${w.en}</td>
+        <td><span class="vt-th">${w.th}</span></td>
+        <td><button class="stroke-btn" onclick='openStroke(${JSON.stringify(w)})'>🖊</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`:'';
+
+  document.getElementById('lc').innerHTML=`
+    <div class="lh">
+      <div class="lh-c" style="background:linear-gradient(135deg,${col},${col}bb)">${n}</div>
+      <div>
+        <div class="lh-zh">第${n}课 · ${lv.title}</div>
+        <div class="lh-en">Lesson ${n} · ${lv.title_en}</div>
+        <div style="font-size:.68rem;color:var(--muted);margin-top:3px">${D.books[bk].name_en}</div>
+      </div>
+      <div class="lh-btns">
+        <button class="btn btn-r" onclick="goView('flashcard')">🃏 Flashcard</button>
+        <button class="btn btn-g" onclick="startQuiz()">✏️ ทดสอบ</button>
+        <button class="btn btn-p" onclick="printSheet('${bk}',${n})">🖨️ พิมพ์ตารางคัด</button>
+      </div>
+    </div>
+    ${dlHTML}${ksHTML}${grHTML}${vtHTML}`;
+}
+
+/* ── PRINT SHEET ── */
+function printSheet(bk,n){
+  const lv=D.books[bk].lessons[n.toString()];
+  if(!lv)return;
+  const vc=lv.vocab||lv.words||[];
+  const col=BKC[bk];
+  const CELLS=14; // cells per row — reduced for A4 fit
+
+  const rows=vc.map((w,wi)=>{
+    const chars=[...w.zh];
+    // row1 = model chars + rest empty
+    const r1=Array.from({length:CELLS},(_,i)=>{
+      const isM=i<chars.length;
+      return `<div class="psc${isM?' model':''}">
+        ${isM?`<div class="ps-mc">${chars[i]}</div>`:''}
+        ${i===0&&!isM?'<div class="ps-rl">ตาม</div>':''}
+      </div>`;
+    }).join('');
+    // row2 = all empty
+    const r2=Array.from({length:CELLS},(_,i)=>
+      `<div class="psc">${i===0?'<div class="ps-rl">เอง</div>':''}</div>`
+    ).join('');
+    return `<div class="ps-word">
+      <div class="ps-meta">
+        <span class="ps-zh">${w.zh}</span>
+        <span class="ps-py">${w.py}</span>
+        ${w.type?`<span class="vt-type" style="font-size:6pt">${w.type}</span>`:''}
+        <span class="ps-en">${w.en}</span>
+        <span class="ps-th">· ${w.th}</span>
+      </div>
+      <div class="ps-grid">${r1}</div>
+      <div class="ps-grid" style="margin-top:1pt;border-top:0.5pt dashed #bbb">${r2}</div>
+    </div>
+    ${wi<vc.length-1?'<div class="ps-divider"></div>':''}`;
+  }).join('');
+
+  document.getElementById('psheet').innerHTML=`
+    <div class="ps-lesson">
+      <div class="ps-hdr" style="background:${col};-webkit-print-color-adjust:exact;print-color-adjust:exact">
+        <div>
+          <div class="ps-h-zh">第${n}课 · ${lv.title}</div>
+          <div style="font-size:7pt;color:rgba(255,255,255,.8)">${lv.title_en} · ${D.books[bk].name}</div>
+        </div>
+        <div class="ps-h-info">${vc.length} คำศัพท์<br>แถวบน=ตามแบบ · แถวล่าง=ฝึกเอง</div>
+      </div>
+      ${rows}
+    </div>`;
+  window.print();
+}
+
+/* ── FLASHCARD ── */
+function updateFC(){
+  if(!fcW.length){
+    document.getElementById('fcFt').textContent='ไม่มีคำศัพท์';return;
+  }
+  const w=fcW[fcI];
+  const card=document.getElementById('fcCard');
+  // Reset to front
+  card.classList.remove('flipped');
+  fcFlipped=false;
+
+  const lv=D.books[curBk].lessons[curLn.toString()];
+  document.getElementById('fcName').textContent=`บทที่ ${curLn} · ${lv?lv.title:''}`;
+
+  let front='';
+  if(fcMode==='zh2th')front=w.zh;
+  else if(fcMode==='th2zh')front=w.th;
+  else if(fcMode==='py2zh')front=w.py;
+  else front=w.zh;
+
+  document.getElementById('fcFt').textContent=front;
+  document.getElementById('fcPy').textContent=w.py;
+  document.getElementById('fcTyp').textContent=w.type?`(${w.type})`:'';
+  document.getElementById('fcEn').textContent=w.en;
+  document.getElementById('fcTh').textContent=w.th;
+  document.getElementById('fcCnt').textContent=`${fcI+1}/${fcW.length}`;
+  buildDots();
+}
+
+function buildDots(){
+  const r=document.getElementById('fcDots');r.innerHTML='';
+  fcW.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='fcd'+(i<fcI?' seen':'')+(i===fcI?' cur':'');
+    d.onclick=()=>{fcI=i;updateFC();};
+    r.appendChild(d);
+  });
+}
+
+function flipFC(){
+  document.getElementById('fcCard').classList.toggle('flipped');
+  fcFlipped=!fcFlipped;
+}
+
+function fcNext(){
+  if(fcI<fcW.length-1){fcI++;updateFC();}
+  else{
+    // advance to next lesson
+    let found=false;
+    for(const [bk,bv] of Object.entries(D.books)){
+      for(const ln of Object.keys(bv.lessons).map(Number).sort((a,b)=>a-b)){
+        if(found){showLesson(bk,ln);goView('flashcard');return;}
+        if(bk===curBk&&ln===curLn)found=true;
+      }
+    }
+    fcI=0;updateFC();
+  }
+}
+
+function fcPrev(){
+  if(fcI>0){fcI--;updateFC();}
+  else{
+    let prev=null;
+    for(const [bk,bv] of Object.entries(D.books)){
+      for(const ln of Object.keys(bv.lessons).map(Number).sort((a,b)=>a-b)){
+        if(bk===curBk&&ln===curLn){
+          if(prev){showLesson(prev.bk,prev.ln);goView('flashcard');}
+          return;
+        }
+        prev={bk,ln};
+      }
+    }
+    fcI=fcW.length-1;updateFC();
+  }
+}
+
+// Wire up buttons and modes
+document.getElementById('fcCard').onclick=flipFC;
+document.getElementById('fcNext').onclick=fcNext;
+document.getElementById('fcPrev').onclick=fcPrev;
+document.querySelectorAll('.fcm').forEach(b=>{
+  b.onclick=()=>{
+    fcMode=b.dataset.mode;
+    document.querySelectorAll('.fcm').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    fcI=0;updateFC();
+  };
+});
+
+/* ── QUIZ ── */
+function startQuiz(){
+  goView('quiz');
+  qSc=0;qWr=0;qI=0;
+  qW=[...fcW].sort(()=>Math.random()-.5);
+  const lv=D.books[curBk].lessons[curLn.toString()];
+  document.getElementById('qSub').textContent=`บทที่ ${curLn} · ${lv?.title||''} · ${qW.length} คำ`;
+  document.getElementById('qStat').style.display='flex';
+  renderQ();
+}
+
+document.querySelectorAll('.qmode').forEach(b=>{
+  b.onclick=()=>{
+    qMode=b.dataset.qm;
+    document.querySelectorAll('.qmode').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    if(qW.length){qI=0;qSc=0;qWr=0;renderQ();}
+  };
+});
+
+function allVocab(){
+  const a=[];
+  Object.values(D.books).forEach(bv=>Object.values(bv.lessons).forEach(lv=>{
+    (lv.vocab||lv.words||[]).forEach(w=>a.push(w));
+  }));
+  return a;
+}
+
+function renderQ(){
+  if(!qW.length){document.getElementById('qArea').innerHTML='<p style="padding:16px;color:var(--muted)">เลือกบทก่อนแล้วกด ✏️ ทดสอบ</p>';return;}
+  updQStat();
+  if(qI>=qW.length){showQEnd();return;}
+  const w=qW[qI];
+  const area=document.getElementById('qArea');
+
+  if(qMode==='c4'){
+    const wrongs=allVocab().filter(x=>x.zh!==w.zh).sort(()=>Math.random()-.5).slice(0,3);
+    const opts=[w,...wrongs].sort(()=>Math.random()-.5);
+    area.innerHTML=`<div class="qcard">
+      <div class="q-zh">${w.zh}</div>
+      <div class="q-py">${w.py}</div>
+      <div class="q-opts">${opts.map(o=>`
+        <button class="qopt" data-val="${o.zh}">
+          ${o.th}<br><small style="color:var(--muted);font-size:.68rem">${o.en}</small>
+        </button>`).join('')}</div>
+      <div id="qr" class="qres" style="display:none"></div>
+    </div>`;
+    document.querySelectorAll('.qopt').forEach(b=>{
+      b.onclick=()=>checkC4(b.dataset.val,w.zh,w.th);
+    });
+
+  }else if(qMode==='fill'){
+    area.innerHTML=`<div class="qcard">
+      <div style="text-align:center;color:var(--muted);font-size:.8rem;margin-bottom:8px">พิมพ์คำจีน</div>
+      <div class="q-zh" style="font-size:1.2rem;color:var(--muted)">${w.th}</div>
+      <div class="q-py" style="color:var(--muted)">${w.en}</div>
+      <input class="q-fill" id="qFill" placeholder="พิมพ์ที่นี่..." autofocus>
+      <button class="qbtn" id="qSub2">ตรวจ ✓</button>
+      <div id="qr" class="qres" style="display:none"></div>
+    </div>`;
+    const go=()=>checkFill(w.zh,w.py);
+    document.getElementById('qSub2').onclick=go;
+    document.getElementById('qFill').addEventListener('keypress',e=>{if(e.key==='Enter')go();});
+
+  }else{
+    const lv=D.books[curBk].lessons[curLn.toString()];
+    if(!lv?.dialogue?.length){qMode='c4';document.querySelector('.qmode[data-qm="c4"]').click();return;}
+    const di=qI%lv.dialogue.length;
+    const dl=lv.dialogue[di];
+    const wrongs=allVocab().filter(x=>x.th!==dl.th).sort(()=>Math.random()-.5).slice(0,3);
+    const opts=[{zh:dl.zh,th:dl.th},...wrongs].sort(()=>Math.random()-.5);
+    area.innerHTML=`<div class="qcard">
+      <div style="text-align:center;color:var(--muted);font-size:.75rem;margin-bottom:8px">ความหมายของประโยคนี้?</div>
+      <div class="q-zh" style="font-size:1.2rem">${dl.zh}</div>
+      <div class="q-py">${dl.py||''}</div>
+      <div class="q-opts">${opts.map(o=>`<button class="qopt" data-th="${o.th}">${o.th}</button>`).join('')}</div>
+      <div id="qr" class="qres" style="display:none"></div>
+    </div>`;
+    document.querySelectorAll('.qopt').forEach(b=>{
+      b.onclick=()=>checkDL(b.dataset.th,dl.th);
+    });
+  }
+}
+
+function checkC4(sel,correct,correctTh){
+  document.querySelectorAll('.qopt').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.val===correct)b.classList.add('ok');
+    else if(b.dataset.val===sel&&sel!==correct)b.classList.add('bad');
+  });
+  const ok=sel===correct;
+  if(ok)qSc++;else qWr++;
+  showQRes(ok?`✅ ถูกต้อง!`:`❌ ผิด — ${correctTh}`,ok);
+}
+
+function checkFill(correct,py){
+  const v=(document.getElementById('qFill')?.value||'').trim();
+  const ok=v===correct;
+  document.getElementById('qFill').disabled=true;
+  document.getElementById('qSub2').disabled=true;
+  if(ok)qSc++;else qWr++;
+  showQRes(ok?'✅ ถูกต้อง!':`❌ คำตอบ: ${correct} (${py})`,ok);
+}
+
+function checkDL(sel,correct){
+  document.querySelectorAll('.qopt').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.th===correct)b.classList.add('ok');
+    else if(b.dataset.th===sel&&sel!==correct)b.classList.add('bad');
+  });
+  const ok=sel===correct;
+  if(ok)qSc++;else qWr++;
+  showQRes(ok?'✅ ถูกต้อง!':`❌ ผิด`,ok);
+}
+
+function showQRes(msg,ok){
+  updQStat();qI++;
+  const r=document.getElementById('qr');
+  r.textContent=msg;r.className=`qres ${ok?'ok':'bad'}`;r.style.display='block';
+  const nb=document.createElement('button');
+  nb.className='qbtn';nb.style.background='var(--blue)';
+  nb.textContent=qI<qW.length?'ข้อถัดไป →':'🎉 ดูผล';
+  nb.onclick=renderQ;
+  document.querySelector('.qcard').appendChild(nb);
+}
+
+function updQStat(){
+  document.getElementById('qCur').textContent=Math.min(qI+1,qW.length);
+  document.getElementById('qTot').textContent=qW.length;
+  document.getElementById('qSc').textContent=qSc;
+  document.getElementById('qWr').textContent=qWr;
+}
+
+function showQEnd(){
+  const pct=Math.round(qSc/qW.length*100);
+  document.getElementById('qArea').innerHTML=`
+    <div class="qcard" style="text-align:center;padding:32px 20px">
+      <div style="font-size:3rem;margin-bottom:14px">${pct>=80?'🎉':'😊'}</div>
+      <div style="font-size:1.3rem;font-weight:700">${pct>=80?'ยอดเยี่ยม!':pct>=60?'ดีมาก':'ต้องฝึกเพิ่ม'}</div>
+      <div style="color:var(--green);font-weight:700;font-size:1.1rem;margin-top:8px">${qSc}/${qW.length} = ${pct}%</div>
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:center">
+        <button class="qbtn" style="max-width:160px" onclick="startQuiz()">🔄 ทำใหม่</button>
+        <button class="qbtn blue" style="max-width:160px" onclick="goView('flashcard')">🃏 ทบทวน</button>
+      </div>
+    </div>`;
+}
+
+/* ── GRAMMAR VIEW ── */
+function buildGrammar(){
+  let h='';
+  Object.entries(D.books).forEach(([bk,bv])=>{
+    const col=BKC[bk];
+    const items=Object.entries(bv.lessons)
+      .filter(([,lv])=>lv.grammar?.length)
+      .sort((a,b)=>parseInt(a[0])-parseInt(b[0]));
+    if(!items.length)return;
+    h+=`<div class="gbsec">
+      <div class="gblabel">
+        <span class="gbtag" style="background:${col}">${bv.name_th||bv.name_en}</span>
+        <span style="font-size:.75rem;color:var(--muted)">${bv.name_en}</span>
+      </div>`;
+    items.forEach(([ln,lv])=>{
+      h+=`<div class="glg-grp">
+        <div class="glg-h">บทที่ ${ln} · ${lv.title} · ${lv.title_en}</div>
+        <div class="ggrid">${lv.grammar.map(g=>`
+          <div class="gm">
+            <div class="gm-h">${g.rule}</div>
+            <div class="gm-b">
+              <div class="gm-pat">${g.zh}</div>
+              <div class="gm-ex">
+                <strong>${(g.example||'').split('=')[0]?.trim()}</strong>
+                ${g.example?.includes('=')?'= '+g.example.split('=').slice(1).join('=').trim():''}
+                <br><span style="color:var(--blue);font-size:.72rem">${g.th||''}</span>
+              </div>
+            </div>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    });
+    h+='</div>';
+  });
+  document.getElementById('gc').innerHTML=h;
+}
+
+/* ── INDEX ── */
+function buildIndex(){
+  const all=[];
+  Object.entries(D.books).forEach(([bk,bv])=>{
+    Object.entries(bv.lessons).forEach(([ln,lv])=>{
+      (lv.vocab||lv.words||[]).forEach(w=>all.push({...w,ln:parseInt(ln),bk}));
+    });
+  });
+  document.getElementById('ivSub').textContent=`${all.length} คำ · ทุกเล่ม`;
+  const g=document.getElementById('ig');g.innerHTML='';
+  all.forEach(e=>{
+    const d=document.createElement('div');
+    d.className='ie';
+    d.dataset.q=(e.zh+e.py+e.th+e.en).toLowerCase();
+    d.dataset.bk=e.bk;
+    d.onclick=()=>showLesson(e.bk,e.ln);
+    d.innerHTML=`<div class="ie-zh">${e.zh}</div>
+      <div class="ie-info">
+        <div class="ie-py">${e.py}${e.type?' · '+e.type:''}</div>
+        <div class="ie-th">${e.th}</div>
+      </div>
+      <div class="ie-tag" style="background:${BKC[e.bk]}">${BKL[e.bk]}${e.ln}</div>`;
+    g.appendChild(d);
+  });
+}
+
+document.getElementById('iQ').oninput=()=>{
+  const q=document.getElementById('iQ').value.toLowerCase().trim();
+  document.querySelectorAll('.ie').forEach(el=>{
+    el.style.display=(idxF==='all'||el.dataset.bk===idxF)&&(!q||el.dataset.q.includes(q))?'':'none';
+  });
+};
+document.querySelectorAll('.idf').forEach(b=>{
+  b.onclick=()=>{
+    idxF=b.dataset.f;
+    document.querySelectorAll('.idf').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('iQ').dispatchEvent(new Event('input'));
+  };
+});
+
+/* ── STROKE ORDER ── */
+function openStroke(w){
+  if(typeof w==='string')w=JSON.parse(w);
+  smWord=w;
+  document.getElementById('smC').textContent=w.zh;
+  document.getElementById('smP').textContent=w.py;
+  document.getElementById('smT').textContent=w.th;
+  document.getElementById('smMsg').textContent='';
+  document.getElementById('smodal').style.display='flex';
+  initHW(w.zh[0]);
+}
+
+function initHW(char){
+  // Clear SVG
+  const svg=document.getElementById('sm-svg');
+  svg.innerHTML='';
+  HW=null;
+  if(typeof HanziWriter==='undefined'){
+    svg.innerHTML=`<text x="90" y="130" text-anchor="middle" font-family="Noto Serif SC,serif" font-size="110" fill="#1c1814">${char}</text>`;
+    document.getElementById('smMsg').textContent='⚠️ ไม่สามารถโหลด HanziWriter ได้';
+    return;
+  }
+  try{
+    HW=HanziWriter.create('sm-svg',char,{
+      width:180,height:180,padding:18,
+      strokeColor:'#1c1814',
+      radicalColor:'#c0392b',
+      outlineColor:'#ddd',
+      showCharacter:true,
+      showOutline:true,
+      strokeAnimationSpeed:1,
+      delayBetweenStrokes:300,
+      onLoadCharDataSuccess:()=>{
+        document.getElementById('smMsg').textContent='โหลดสำเร็จ ✓ กดปุ่มเพื่อเริ่ม';
+      },
+      onLoadCharDataError:()=>{
+        document.getElementById('smMsg').textContent='⚠️ ไม่พบข้อมูลลำดับขีดของตัวอักษรนี้';
+      }
+    });
+  }catch(e){
+    svg.innerHTML=`<text x="90" y="130" text-anchor="middle" font-family="Noto Serif SC,serif" font-size="110" fill="#1c1814">${char}</text>`;
+    document.getElementById('smMsg').textContent='⚠️ '+e.message;
+  }
+}
+
+document.getElementById('smAnim').onclick=()=>{
+  if(!HW){document.getElementById('smMsg').textContent='กรุณารอโหลดก่อน';return;}
+  document.getElementById('smMsg').textContent='กำลังแสดง...';
+  HW.animateCharacter({
+    onComplete:()=>{document.getElementById('smMsg').textContent='✓ เสร็จแล้ว';}
+  });
+};
+
+document.getElementById('smQuiz').onclick=()=>{
+  if(!HW){document.getElementById('smMsg').textContent='กรุณารอโหลดก่อน';return;}
+  document.getElementById('smMsg').textContent='✏️ ลากเขียนตามลำดับขีด';
+  HW.quiz({
+    onMistake:()=>{document.getElementById('smMsg').textContent='❌ ลองใหม่';},
+    onCorrectStroke:()=>{document.getElementById('smMsg').textContent='✓ ถูก! ขีดต่อไป';},
+    onComplete:()=>{document.getElementById('smMsg').textContent='🎉 เยี่ยม! ถูกต้องทุกขีด';}
+  });
+};
+
+document.getElementById('smReset').onclick=()=>{
+  if(smWord)initHW(smWord.zh[0]);
+};
+
+function closeStroke(){
+  document.getElementById('smodal').style.display='none';
+  HW=null;
+}
+document.getElementById('smodal').onclick=e=>{
+  if(e.target===document.getElementById('smodal'))closeStroke();
+};
+
+/* ── VIEW SWITCHING ── */
+function goView(v){
+  curView=v;
+  document.querySelectorAll('.view').forEach(e=>e.classList.remove('on'));
+  document.getElementById('view-'+v).classList.add('on');
+  document.querySelectorAll('.ntab').forEach(b=>{
+    b.classList.toggle('on',b.dataset.view===v);
+  });
+  if(v==='flashcard')updateFC();
+}
+document.querySelectorAll('.ntab').forEach(b=>{
+  b.onclick=()=>goView(b.dataset.view);
+});
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(curView==='flashcard'){
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();fcNext();}
+    else if(e.key==='ArrowLeft')fcPrev();
+    else if(e.key==='ArrowUp'||e.key==='Enter'){e.preventDefault();flipFC();}
+  }
+  if(e.key==='Escape')closeStroke();
+});
+
+/* ── SWIPE ── */
+let tx=0,ty=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX;ty=e.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',e=>{
+  if(curView!=='flashcard')return;
+  const dx=e.changedTouches[0].clientX-tx;
+  const dy=e.changedTouches[0].clientY-ty;
+  // Ignore swipes that are more vertical than horizontal, or start from sidebar zone
+  if(Math.abs(dy)>Math.abs(dx))return;
+  if(tx<30)return; // left edge - avoid conflict with sidebar swipe
+  if(Math.abs(dx)>55){dx<0?fcNext():fcPrev();}
+},{passive:true});
+
+/* ── MOBILE SIDEBAR TOGGLE ── */
+(function(){
+  const btn=document.getElementById('menuBtn');
+  const sb=document.getElementById('sb');
+  const ov=document.getElementById('sbOverlay');
+  let sbOpen=false;
+  function openSB(){
+    sbOpen=true;
+    sb.classList.add('open');
+    ov.classList.add('open');
+    // Do NOT set body overflow - it breaks scrolling and button presses
+  }
+  function closeSB(){
+    sbOpen=false;
+    sb.classList.remove('open');
+    ov.classList.remove('open');
+  }
+  btn.addEventListener('click',function(e){e.stopPropagation();openSB();});
+  ov.addEventListener('click',closeSB);
+  // Close sidebar when a lesson item is tapped on mobile
+  sb.addEventListener('click',function(e){
+    if(window.innerWidth<=700 && e.target.closest('.sbi')){
+      setTimeout(closeSB,180); // slight delay so lesson loads first
+    }
+  });
+  // Close on Escape
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'&&sbOpen)closeSB();
+  });
+})();
+
+/* ── INIT ── */
+buildSB();
+buildGrammar();
+buildIndex();
+showLesson('hanyu_1a',1);
+</script>
+</body>
+</html>
