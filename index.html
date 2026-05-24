@@ -614,14 +614,14 @@ function showLesson(bk,n){
   const vtHTML=vc.length?`
     <div class="sec"><span>📝</span>คำศัพท์ (${vc.length} คำ)</div>
     <div class="vt-w"><table class="vt">
-      <thead><tr><th>อักษร</th><th>พินอิน</th><th>ประเภท</th><th>English</th><th>ภาษาไทย</th><th>ขีด</th></tr></thead>
+      <thead><tr><th>อักษร</th><th>พินอิน</th><th>ประเภท</th><th>English</th><th>ภาษาไทย</th></tr></thead>
       <tbody>${vc.map(w=>`<tr>
         <td><span class="vt-zh">${w.zh}</span></td>
         <td><span class="vt-py">${w.py}</span></td>
         <td>${w.type?`<span class="vt-type">${w.type}</span>`:''}</td>
         <td>${w.en}</td>
         <td><span class="vt-th">${w.th}</span></td>
-        <td><button class="stroke-btn" onclick='openStroke(${JSON.stringify(w)})'>🖊</button></td>
+      
       </tr>`).join('')}</tbody>
     </table></div>`:'';
 
